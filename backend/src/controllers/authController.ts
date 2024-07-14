@@ -5,6 +5,7 @@ import { pool } from "../config/database";
 import { sendConfirmationEmail } from "../utils/email";
 import { v4 as uuidv4 } from "uuid";
 import { AuthInfo } from "../types/auth";
+import { User } from "../models/user";
 
 export const registerUser = async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
@@ -41,7 +42,7 @@ export const confirmEmail = async (req: Request, res: Response) => {
 };
 
 export const loginUser = (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate("local", (err: Error, user: any, info: AuthInfo) => {
+    passport.authenticate("local", (err: Error, user: User, info: AuthInfo) => {
         if (err) {
             return next(err);
         }

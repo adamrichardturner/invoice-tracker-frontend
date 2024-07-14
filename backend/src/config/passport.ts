@@ -3,17 +3,22 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { pool } from "./database";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import { User } from "../models/user";
 
 dotenv.config();
 
-passport.serializeUser((user: any, done) => {
-    done(null, user.id);
+passport.serializeUser((user: Express.User, done) => {
+    done(null, (user as User).id);
 });
 
 passport.deserializeUser(async (id: string, done) => {
     try {
         const res = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-        done(null, res.rows[0]);
+        if (res.rows.length > 0) {
+            done(null, res.rows[0]);
+        } else {
+            done(new Error("User not found"), null);
+        }
     } catch (err) {
         done(err, null);
     }

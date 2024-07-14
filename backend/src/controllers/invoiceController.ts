@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../config/database";
+import { InvoiceItem } from "../models/invoiceItem";
 
 export const createInvoice = async (req: Request, res: Response) => {
     const {
@@ -25,7 +26,7 @@ export const createInvoice = async (req: Request, res: Response) => {
         );
         const invoice_id = result.rows[0].id;
 
-        const itemQueries = items.map((item: any) =>
+        const itemQueries = items.map((item: InvoiceItem) =>
             pool.query(
                 "INSERT INTO invoice_items (invoice_id, description, quantity, unit_price) VALUES ($1, $2, $3, $4)",
                 [invoice_id, item.description, item.quantity, item.unit_price],

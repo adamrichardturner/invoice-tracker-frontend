@@ -1,9 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config = {
-    mode: "jit",
-    darkMode: ["class"],
-    purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+    darkMode: "class",
     content: [
         "./pages/**/*.{ts,tsx}",
         "./components/**/*.{ts,tsx}",
@@ -58,12 +56,15 @@ const config = {
                 paidGreen: "hsl(var(--paid-green))",
                 pendingOrange: "hsl(var(--pending-orange))",
                 draftGray: "hsl(var(--draft-gray))",
+                body: "hsl(var(--body))",
                 secondaryBody: "hsl(var(--secondary-body))",
+                heading: "hsl(var(--heading))",
             },
             borderRadius: {
                 lg: "var(--radius)",
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
+                roundedBtn: "var(--btn-rounded)",
             },
             keyframes: {
                 "accordion-down": {

@@ -51,19 +51,19 @@
         --secondary-foreground: 231 37% 63%; /* 04 Lighter Purple */
         --body: 231 37% 63%; /* 07 Gray Purple - Body Typography */
         --secondary-body: 231 73% 93%; /* 06 Dark Lilac */
-        --heading: 228 29% 7%; /* 08 Dark Off Black - Heading Typography */
+        --heading: 0 0% 100%; /* White - Heading Typography */
         --paid-green: #33d69f; /* Green */
         --pending-orange: #ff8f00; /* Pending Orange */
         --draft-gray: #373b53; /* Draft Gray */
         --muted: 210 40% 96.1%;
         --muted-foreground: 215.4 16.3% 46.9%;
         --accent: 210 40% 96.1%;
-        --accent-foreground: 222.2 47.4% 11.2%;
+        --accent-foreground: 0 0% 100%;
         --destructive: 0 80% 63%; /* 09 Dark Red Alert */
         --destructive-foreground: 0 100% 80%; /* 10 Light Red Alert */
         --border: 250 27% 98%; /* 06 Input Border */
         --input: 214.3 31.8% 91.4%;
-        --ring: 222.2 84% 4.9%;
+        --ring: 0 0% 100%;
         --radius: 0.5rem;
         --btn-rounded: 24px;
         --chart-1: 220 70% 50%;
@@ -76,7 +76,7 @@
 
 @layer base {
     * {
-        @apply border border-border;
+        @apply border-border;
     }
     body {
         @apply bg-background text-foreground;

@@ -7,6 +7,43 @@ import { User } from "../models/user";
 
 dotenv.config();
 
+passport.use(
+    new LocalStrategy(
+        {
+            usernameField: "email",
+            passwordField: "password",
+        },
+        async (email, password, done) => {
+            try {
+                const result = await pool.query(
+                    "SELECT * FROM users WHERE email = $1",
+                    [email],
+                );
+                const user: User = result.rows[0];
+
+                if (!user) {
+                    return done(null, false, { message: "Incorrect email." });
+                }
+
+                const isMatch = await bcrypt.compare(
+                    password,
+                    user.password_hash,
+                );
+
+                if (!isMatch) {
+                    return done(null, false, {
+                        message: "Incorrect password.",
+                    });
+                }
+
+                return done(null, user);
+            } catch (err) {
+                return done(err);
+            }
+        },
+    ),
+);
+
 passport.serializeUser((user: Express.User, done) => {
     done(null, (user as User).id);
 });
@@ -23,41 +60,3 @@ passport.deserializeUser(async (id: string, done) => {
         done(err, null);
     }
 });
-
-passport.use(
-    new LocalStrategy(
-        {
-            usernameField: "email",
-            passwordField: "password",
-        },
-        async (email, password, done) => {
-            try {
-                const res = await pool.query(
-                    "SELECT * FROM users WHERE email = $1",
-                    [email],
-                );
-                const user = res.rows[0];
-                if (!user) {
-                    return done(null, false, { message: "Incorrect email." });
-                }
-                if (!user.email_confirmed) {
-                    return done(null, false, {
-                        message: "Email not confirmed.",
-                    });
-                }
-                const isMatch = await bcrypt.compare(
-                    password,
-                    user.password_hash,
-                );
-                if (!isMatch) {
-                    return done(null, false, {
-                        message: "Incorrect password.",
-                    });
-                }
-                return done(null, user);
-            } catch (err) {
-                return done(err);
-            }
-        },
-    ),
-);

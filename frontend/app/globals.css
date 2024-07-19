@@ -9,6 +9,7 @@
         --card: 0 0% 100%;
         --card-foreground: 222.2 84% 4.9%;
         --popover: 0 0% 100%;
+        --sidebar-bg: #373b53;
         --popover-foreground: 222.2 84% 4.9%;
         --primary: 252 94% 67%; /* 01 Dark Lilac */
         --primary-foreground: 252 100% 73%; /* 02 Light Lilac */
@@ -44,6 +45,7 @@
         --card: 222.2 84% 4.9%;
         --card-foreground: 210 40% 98%;
         --popover: 222.2 84% 4.9%;
+        --sidebar-bg: #1e2139;
         --popover-foreground: 210 40% 98%;
         --primary: 252 94% 67%; /* 01 Dark Lilac */
         --primary-foreground: 252 100% 73%; /* 02 Light Lilac */

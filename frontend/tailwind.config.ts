@@ -59,6 +59,7 @@ const config = {
                 body: "hsl(var(--body))",
                 secondaryBody: "hsl(var(--secondary-body))",
                 heading: "hsl(var(--heading))",
+                sidebarBg: "var(--sidebar-bg)",
             },
             borderRadius: {
                 lg: "var(--radius)",

@@ -7,8 +7,10 @@ export default function ProtectedPage() {
             <Sidebar />
             <main className="flex w-full min-h-screen flex-col items-center justify-between p-24">
                 <ModeToggle />
-                <h1>Protected Content</h1>
-                <p>
+                <h1 className="text-primary-foreground text-3xl">
+                    Protected Content
+                </h1>
+                <p className="text-heading">
                     This is a protected page. Only logged-in users can see this
                     content.
                 </p>

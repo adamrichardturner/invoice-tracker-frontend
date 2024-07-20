@@ -1,7 +1,7 @@
 export default function SheetToggle() {
     return (
-        <div className="min-w-[80px] min-h-[80px] md:w-full md:h-[104px] md:flex md:flex-col rounded-tr-3xl relative">
-            <div className="absolute hidden md:flex w-full h-full justify-center items-center">
+        <div className="min-w-[80px] min-h-[80px] md:w-full md:h-[120px] md:flex md:flex-col relative cursor-pointer">
+            <div className="absolute  hidden md:flex w-full h-full justify-center items-center">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"

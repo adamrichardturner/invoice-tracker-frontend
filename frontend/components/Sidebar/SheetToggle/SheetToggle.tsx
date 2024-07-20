@@ -1,7 +1,7 @@
 export default function SheetToggle() {
     return (
-        <div className="w-full h-[104px] flex flex-col rounded-tr-3xl relative">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="min-w-[80px] min-h-[80px] md:w-full md:h-[104px] md:flex md:flex-col rounded-tr-3xl relative">
+            <div className="absolute hidden md:flex w-full h-full justify-center items-center">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
@@ -17,10 +17,24 @@ export default function SheetToggle() {
                     />
                 </svg>
             </div>
+            <div className="h-full flex items-center justify-center w-full md:hidden absolute">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="30"
+                    height="30"
+                    viewBox="0 0 40 38"
+                    fill="none"
+                >
+                    <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M10.6942 0.292175L20 18.9999L29.3058 0.292175C35.6645 3.64073 40 10.314 40 17.9999C40 29.0456 31.0457 37.9999 20 37.9999C8.9543 37.9999 0 29.0456 0 17.9999C0 10.314 4.33546 3.64073 10.6942 0.292175Z"
+                        fill="white"
+                    />
+                </svg>
+            </div>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="103"
-                height="103"
                 viewBox="0 0 103 103"
                 fill="none"
             >

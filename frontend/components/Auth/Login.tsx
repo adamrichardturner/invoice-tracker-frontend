@@ -93,7 +93,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                     </div>
                     <Button
                         type="submit"
-                        className="w-full text-white rounded-roundedBtn"
+                        className="w-full text-white bg-primary rounded-roundedBtn"
                     >
                         Sign In
                     </Button>

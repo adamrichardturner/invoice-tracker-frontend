@@ -35,14 +35,14 @@ export function DatePicker<T extends FieldValues>({
             name={name}
             render={({ field, fieldState }) => (
                 <FormItem className="flex flex-col">
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel className="mb-2">{label}</FormLabel>
                     <Popover>
                         <PopoverTrigger asChild>
                             <FormControl>
                                 <Button
                                     variant={"calendar"}
                                     className={cn(
-                                        "w-[240px] pl-3 text-left font-normal",
+                                        "w-[224px] pl-3 text-left font-normal",
                                         !field.value &&
                                             "text-heading bg-foreground",
                                     )}

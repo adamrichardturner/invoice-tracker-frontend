@@ -18,6 +18,9 @@ const config = {
             },
         },
         extend: {
+            boxShadow: {
+                md: "0 8px 15px -15px rgba(0, 0, 0, 0.2)",
+            },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
@@ -65,6 +68,7 @@ const config = {
                 fadedBody: "var(--faded-body)",
                 checkboxBg: "var(--checkboxBg)",
                 checkboxBgActive: "var(--checkboxBg-active)",
+                invoiceCard: "var(--invoice-card)",
             },
             borderRadius: {
                 lg: "var(--radius)",

@@ -38,7 +38,7 @@ export default function InvoiceNav() {
                             height={32}
                             alt="Plus Button"
                         />
-                        <div className="flex items-center leading-tight text-[14px] justify-start align-middle">
+                        <div className="flex items-center leading-tight text-[14px] justify-start align-middle font-[600]">
                             <span className="hidden md:block">New Invoice</span>
                             <span className="md:hidden">New</span>
                         </div>

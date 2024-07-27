@@ -36,6 +36,7 @@
         --faded-body: #888eb0;
         --checkboxBg: #dfe3fa;
         --checkboxBg-active: #7c5dfa;
+        --invoice-card: #ffffff;
         --chart-1: 12 76% 61%;
         --chart-2: 173 58% 39%;
         --chart-3: 197 37% 24%;
@@ -77,6 +78,7 @@
         --faded-body: #dfe3fa;
         --checkboxBg: #dfe3fa;
         --checkboxBg-active: #7c5dfa;
+        --invoice-card: #1e2139;
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
         --chart-3: 30 80% 55%;

@@ -10,7 +10,7 @@ export default async function ProtectedPage() {
         <div className="flex min-h-screen md:ml-[103px] items-start pt-[120px] md:pt-[78px] justify-center">
             <Sidebar />
             <main className="flex flex-col w-full md:w-[740px] items-center justify-center mx-4">
-                <InvoiceNav />
+                <InvoiceNav invoiceTotal={invoices.length} />
                 <InvoiceDisplay invoices={invoices} />
             </main>
         </div>

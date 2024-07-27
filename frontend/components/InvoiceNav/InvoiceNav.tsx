@@ -5,7 +5,11 @@ import OvalPlus from "@/assets/ui/oval-plus.svg";
 import { useUIStore } from "@/stores/UIState/useUIStore";
 import Image from "next/image";
 
-export default function InvoiceNav() {
+interface InvoiceNavProps {
+    invoiceTotal: number;
+}
+
+export default function InvoiceNav({ invoiceTotal }: InvoiceNavProps) {
     const { setSheetOpen, setSelectedEditorMode } = useUIStore((state) => ({
         setSheetOpen: state.setSheetOpen,
         setSelectedEditorMode: state.setSelectedEditorMode,
@@ -18,15 +22,15 @@ export default function InvoiceNav() {
     return (
         <div className="flex flex-row w-full justify-between text-black">
             <div>
-                <h2 className="text-heading text-4xl font-bold tracking-[-1.13px]">
+                <h2 className="text-heading text-2xl md:text-4xl font-bold tracking-[-1.13px]">
                     Invoices
                 </h2>
-                <span className="text-xs tracking-[-0.1px] text-fadedBody">
-                    There are 4 pending invoices
+                <span className="text-xs md:text-md tracking-[-0.1px] text-fadedBody">
+                    {invoiceTotal} invoices
                 </span>
             </div>
             <div className="flex items-start space-x-6">
-                <div className="flex space-x-6">
+                <div className="flex space-x-4 md:space-x-6">
                     <InvoiceFilter />
                     <div
                         className="cursor-pointer flex items-center transition-colors justify-between space-x-3 bg-primary hover:bg-primary-foreground leading-none text-white pl-2 pr-4 py-2 rounded-3xl"

@@ -33,6 +33,7 @@
         --radius: 0.5rem;
         --label: #7e88c3;
         --btn-rounded: 24px;
+        --faded-body: #888eb0;
         --chart-1: 12 76% 61%;
         --chart-2: 173 58% 39%;
         --chart-3: 197 37% 24%;
@@ -71,6 +72,7 @@
         --radius: 0.5rem;
         --label: #ffffff;
         --btn-rounded: 24px;
+        --faded-body: #dfe3fa;
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
         --chart-3: 30 80% 55%;

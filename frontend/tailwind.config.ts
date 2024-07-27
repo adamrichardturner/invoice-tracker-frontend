@@ -62,6 +62,7 @@ const config = {
                 sidebarBg: "var(--sidebar-bg)",
                 form: "var(--form)",
                 label: "var(--label)",
+                fadedBody: "var(--faded-body)",
             },
             borderRadius: {
                 lg: "var(--radius)",

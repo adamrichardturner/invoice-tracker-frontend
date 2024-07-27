@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useController, Control } from "react-hook-form";
 import { InvoiceFormSchemaType } from "../../InvoiceForm";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CountryRegionData } from "react-country-region-selector";
+import { countries } from "./countries";
 
 interface CountrySelectorProps {
     control: Control<InvoiceFormSchemaType>;
@@ -30,16 +30,20 @@ export function CountrySelector({ control, name }: CountrySelectorProps) {
         control,
     });
 
-    const [open, setOpen] = React.useState(false);
-    const [searchQuery, setSearchQuery] = React.useState("");
+    const [open, setOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const handleCountryChange = (value: string) => {
         field.onChange(value);
         setOpen(false);
     };
 
-    const filteredCountries = CountryRegionData.filter((country) =>
-        country[0].toLowerCase().includes(searchQuery.toLowerCase()),
+    if (!countries) {
+        return null;
+    }
+
+    const filteredCountries = countries.filter((country) =>
+        country.label.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     return (
@@ -51,7 +55,7 @@ export function CountrySelector({ control, name }: CountrySelectorProps) {
                     aria-expanded={open}
                     className="w-full justify-between"
                 >
-                    {field.value || "Select country..."}
+                    {"Select country..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
@@ -65,22 +69,22 @@ export function CountrySelector({ control, name }: CountrySelectorProps) {
                     <CommandEmpty>No country found.</CommandEmpty>
                     <CommandGroup>
                         <ScrollArea className="h-72">
-                            {filteredCountries.map(([country]) => (
+                            {filteredCountries.map((country) => (
                                 <CommandItem
-                                    key={country}
+                                    key={country.value}
                                     onSelect={() =>
-                                        handleCountryChange(country)
+                                        handleCountryChange(country.label)
                                     }
                                 >
                                     <Check
                                         className={cn(
                                             "mr-2 h-4 w-4",
-                                            field.value === country
+                                            field.value === country.label
                                                 ? "opacity-100"
                                                 : "opacity-0",
                                         )}
                                     />
-                                    {country}
+                                    {country.label}
                                 </CommandItem>
                             ))}
                         </ScrollArea>

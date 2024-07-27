@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import {
     Sheet,
     SheetContent,
@@ -8,11 +11,21 @@ import {
 } from "@/components/ui/sheet";
 import SheetToggle from "../Sidebar/SheetToggle/SheetToggle";
 import { InvoiceForm } from "../InvoiceForm/index";
+import { useUIStore } from "@/stores/UIState/useUIStore";
 
 export function SideSheet() {
-    const isEditing = false;
+    const { sheetOpen, setSheetOpen, selectedEditorMode } = useUIStore(
+        (state) => ({
+            sheetOpen: state.sheetOpen,
+            setSheetOpen: state.setSheetOpen,
+            selectedEditorMode: state.selectedEditorMode,
+        }),
+    );
+
+    const isEditing = selectedEditorMode === "edit";
+
     return (
-        <Sheet>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
                 <SheetToggle />
             </SheetTrigger>

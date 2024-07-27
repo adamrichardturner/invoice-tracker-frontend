@@ -1,6 +1,21 @@
+import { useUIStore } from "@/stores/UIState/useUIStore";
+
 export default function SheetToggle() {
+    const { setSheetOpen, setSelectedEditorMode } = useUIStore((state) => ({
+        setSheetOpen: state.setSheetOpen,
+        setSelectedEditorMode: state.setSelectedEditorMode,
+    }));
+
+    const handleToggleSheet = () => {
+        setSelectedEditorMode("create");
+        setSheetOpen(true);
+    };
+
     return (
-        <div className="min-w-[80px] min-h-[80px] md:w-full md:h-[120px] md:flex md:flex-col relative cursor-pointer">
+        <div
+            className="min-w-[80px] min-h-[80px] md:w-full md:h-[120px] md:flex md:flex-col relative cursor-pointer"
+            onClick={handleToggleSheet}
+        >
             <div className="absolute  hidden md:flex w-full h-full justify-center items-center">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

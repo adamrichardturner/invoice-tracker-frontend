@@ -1,52 +1,67 @@
 "use client";
 
 import * as React from "react";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
-
-import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-type Checked = DropdownMenuCheckboxItemProps["checked"];
+import { useUIStore } from "@/stores/UIState/useUIStore";
+import { FilterOption } from "@/stores/UIState/slices/filterSlice";
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 
 export function InvoiceFilter() {
-    const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-    const [showActivityBar, setShowActivityBar] =
-        React.useState<Checked>(false);
-    const [showPanel, setShowPanel] = React.useState<Checked>(false);
+    const { selectedFilters, toggleFilter } = useUIStore((state) => ({
+        selectedFilters: state.selectedFilters,
+        toggleFilter: state.toggleFilter,
+    }));
+
+    const isChecked = (filter: FilterOption) =>
+        selectedFilters.includes(filter);
+
+    const [menuOpen, setMenuOpen] = React.useState(false);
 
     return (
-        <DropdownMenu>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost">Filter by status</Button>
+                <button className="flex items-center">
+                    <span className="hidden md:block text-heading text-md tracking-[-0.25px] font-bold">
+                        Filter by status
+                    </span>
+                    <span className="md:hidden text-heading text-md tracking-[-0.25px] font-bold">
+                        Filter
+                    </span>
+                    {menuOpen ? (
+                        <MdKeyboardArrowUp className="ml-2 font-bold text-primary text-lg" />
+                    ) : (
+                        <MdKeyboardArrowDown className="ml-2 font-bold text-primary text-lg" />
+                    )}
+                </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+            <DropdownMenuContent
+                className="w-[192px] dark:bg-sidebarBg"
+                side="bottom"
+                align="center"
+                sideOffset={20}
+            >
                 <DropdownMenuCheckboxItem
-                    checked={showStatusBar}
-                    onCheckedChange={setShowStatusBar}
+                    checked={isChecked("draft")}
+                    onCheckedChange={() => toggleFilter("draft")}
                 >
-                    Status Bar
+                    Draft
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                    checked={showActivityBar}
-                    onCheckedChange={setShowActivityBar}
-                    disabled
+                    checked={isChecked("pending")}
+                    onCheckedChange={() => toggleFilter("pending")}
                 >
-                    Activity Bar
+                    Pending
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                    checked={showPanel}
-                    onCheckedChange={setShowPanel}
+                    checked={isChecked("paid")}
+                    onCheckedChange={() => toggleFilter("paid")}
                 >
-                    Panel
+                    Paid
                 </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
         </DropdownMenu>

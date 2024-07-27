@@ -1,18 +1,27 @@
-import { create, StateCreator } from "zustand";
+import { StateCreator } from "zustand";
 
-type FilterOption = "all" | "draft" | "pending" | "paid";
+export type FilterOption = "draft" | "pending" | "paid";
 
 export interface IFilterSlice {
-    selectedFilter: FilterOption;
-    setFilter: (newFilter: FilterOption) => void;
+    selectedFilters: FilterOption[];
+    toggleFilter: (filter: FilterOption) => void;
 }
 
 export const createFilterSlice: StateCreator<IFilterSlice> = (set) => ({
-    selectedFilter: "all",
-    setFilter: (newFilter: FilterOption) =>
-        set(() => ({
-            selectedFilter: newFilter,
-        })),
+    selectedFilters: [],
+    toggleFilter: (filter: FilterOption) =>
+        set((state) => {
+            const isSelected = state.selectedFilters.includes(filter);
+            if (isSelected) {
+                return {
+                    selectedFilters: state.selectedFilters.filter(
+                        (selectedFilter) => selectedFilter !== filter,
+                    ),
+                };
+            } else {
+                return {
+                    selectedFilters: [...state.selectedFilters, filter],
+                };
+            }
+        }),
 });
-
-export const useUserStore = create(createFilterSlice);

@@ -63,6 +63,8 @@ const config = {
                 form: "var(--form)",
                 label: "var(--label)",
                 fadedBody: "var(--faded-body)",
+                checkboxBg: "var(--checkboxBg)",
+                checkboxBgActive: "var(--checkboxBg-active)",
             },
             borderRadius: {
                 lg: "var(--radius)",

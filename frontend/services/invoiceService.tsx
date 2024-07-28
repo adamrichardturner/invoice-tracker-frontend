@@ -22,6 +22,23 @@ export const getInvoices = async () => {
     }
 };
 
+export const getInvoiceById = async (id: string) => {
+    try {
+        const response = await api.get(`/api/invoices/${id}`);
+        return response.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            throw new Error(error.message);
+        } else if (error instanceof Error) {
+            throw new Error(
+                error.message ||
+                    "An unknown error occurred while fetching the invoice",
+            );
+        }
+        throw new Error("An unknown error occurred while fetching the invoice");
+    }
+};
+
 export const createInvoice = async (invoiceData: InvoiceFormSchemaType) => {
     try {
         const mappedData = {
@@ -44,6 +61,7 @@ export const createInvoice = async (invoiceData: InvoiceFormSchemaType) => {
                 item_price: parseFloat(item.item_price),
                 item_total: item.item_quantity * parseFloat(item.item_price),
             })),
+            status: invoiceData.status,
         };
 
         const response = await api.post("/api/invoices", mappedData);

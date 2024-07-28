@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/database";
 import { InvoiceItem } from "../models/invoiceItem";
+import Decimal from "decimal.js";
 
 export const createInvoice = async (req: Request, res: Response) => {
     const {
@@ -18,16 +19,34 @@ export const createInvoice = async (req: Request, res: Response) => {
         payment_terms,
         project_description,
         items,
+        status,
     } = req.body;
+
+    const client = await pool.connect();
+
     try {
-        const result = await pool.query(
+        await client.query("BEGIN");
+
+        // Calculate the total price of all items
+        let invoiceTotal = new Decimal(0);
+        for (const item of items) {
+            const itemTotal = new Decimal(item.item_price).mul(
+                item.item_quantity,
+            );
+            invoiceTotal = invoiceTotal.add(itemTotal);
+        }
+
+        // Convert invoiceTotal to a number for insertion
+        const invoiceTotalNumber = invoiceTotal.toNumber();
+
+        const result = await client.query(
             `INSERT INTO invoices (
                 bill_from_street_address, bill_from_city, bill_from_postcode, bill_from_country,
                 bill_to_email, bill_to_name, bill_to_street_address, bill_to_city,
                 bill_to_postcode, bill_to_country, invoice_date, payment_terms,
-                project_description, status
+                project_description, status, invoice_total
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'draft'
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
             ) RETURNING *`,
             [
                 bill_from_street_address,
@@ -43,12 +62,13 @@ export const createInvoice = async (req: Request, res: Response) => {
                 invoice_date,
                 payment_terms,
                 project_description,
+                status,
+                invoiceTotalNumber,
             ],
         );
         const invoice_id = result.rows[0].id;
-
-        const itemQueries = items.map((item: InvoiceItem) =>
-            pool.query(
+        for (const item of items) {
+            await client.query(
                 `INSERT INTO invoice_items (
                     invoice_id, item_description, item_quantity, item_price, item_total
                 ) VALUES ($1, $2, $3, $4, $5)`,
@@ -57,16 +77,33 @@ export const createInvoice = async (req: Request, res: Response) => {
                     item.item_description,
                     item.item_quantity,
                     item.item_price,
-                    item.item_quantity * item.item_price,
+                    new Decimal(item.item_price)
+                        .mul(item.item_quantity)
+                        .toNumber(),
                 ],
-            ),
-        );
+            );
+        }
 
-        await Promise.all(itemQueries);
+        await client.query("COMMIT");
 
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        res.status(500).send("Server error.");
+        await client.query("ROLLBACK");
+        console.error("Error in createInvoice:", err);
+        if (err instanceof Error) {
+            res.status(500).json({
+                error: "Server error",
+                message: err.message,
+                stack: err.stack,
+            });
+        } else {
+            res.status(500).json({
+                error: "Server error",
+                message: "An unknown error occurred",
+            });
+        }
+    } finally {
+        client.release();
     }
 };
 
@@ -94,6 +131,44 @@ export const getInvoices = async (req: Request, res: Response) => {
     }
 };
 
+export const getInvoiceById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const invoiceResult = await pool.query(
+            "SELECT * FROM invoices WHERE id = $1",
+            [id],
+        );
+        if (invoiceResult.rows.length === 0) {
+            return res.status(404).json({ message: "Invoice not found" });
+        }
+
+        const invoice = invoiceResult.rows[0];
+
+        const itemsResult = await pool.query(
+            "SELECT * FROM invoice_items WHERE invoice_id = $1",
+            [id],
+        );
+        invoice.items = itemsResult.rows;
+
+        res.json(invoice);
+    } catch (err: unknown) {
+        console.error("Error in getInvoiceById:", err);
+        if (err instanceof Error) {
+            res.status(500).json({
+                error: "Server error",
+                message: err.message,
+                stack: err.stack,
+            });
+        } else {
+            res.status(500).json({
+                error: "Server error",
+                message: "An unknown error occurred",
+            });
+        }
+    }
+};
+
 export const updateInvoice = async (req: Request, res: Response) => {
     const { id } = req.params;
     const {
@@ -112,6 +187,7 @@ export const updateInvoice = async (req: Request, res: Response) => {
         bill_to_postcode,
         bill_to_country,
     } = req.body;
+
     try {
         const result = await pool.query(
             `UPDATE invoices SET

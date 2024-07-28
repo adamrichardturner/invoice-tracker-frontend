@@ -1,4 +1,7 @@
-import { InvoiceItem } from "./invoiceItem";
+import { InvoiceItem } from "./InvoiceItem";
+
+export type PaymentTerms = "Net 30 Days" | "14 Days" | "7 Days";
+export type InvoiceStatus = "draft" | "pending" | "paid";
 
 export interface Invoice {
     id: string;
@@ -13,11 +16,11 @@ export interface Invoice {
     bill_to_postcode: string;
     bill_to_country: string;
     invoice_date: Date;
-    payment_terms: "Net 30 Days" | "14 Days" | "7 Days";
+    payment_terms: PaymentTerms;
     project_description: string;
-    status: "draft" | "pending" | "paid";
+    status: InvoiceStatus;
     created_at?: Date;
     updated_at?: Date;
     items: InvoiceItem[];
-    invoice_total: string;
+    invoice_total: number;
 }

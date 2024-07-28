@@ -31,7 +31,7 @@ export function SideSheet() {
             </SheetTrigger>
             <SheetContent
                 side="left"
-                className="top-[80px] overflow-y-auto no-scrollbar sm:top-[80px] md:top-0 md:left-[103px] w-full max-w-[100vw] sm:max-w-[580px] sm:rounded-tr-3xl sm:rounded-br-3xl"
+                className="top-[80px] bg-white dark:bg-[#141625] overflow-y-auto no-scrollbar px-6 md:px-10 sm:top-[80px] md:top-0 md:left-[103px] w-full max-w-[100vw] sm:max-w-[580px] sm:rounded-tr-3xl sm:rounded-br-3xl"
             >
                 <SheetHeader>
                     <SheetTitle>

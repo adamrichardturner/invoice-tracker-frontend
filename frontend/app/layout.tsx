@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { League_Spartan } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const spartan = League_Spartan({
     subsets: ["latin"],
-    weight: ["500", "700"],
+    weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     {children}
+                    <Toaster />
                 </ThemeProvider>
             </body>
         </html>

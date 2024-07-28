@@ -19,4 +19,5 @@ export interface Invoice {
     created_at?: Date;
     updated_at?: Date;
     items: InvoiceItem[];
+    invoice_total: string;
 }

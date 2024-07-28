@@ -45,14 +45,14 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
                 </span>
                 <div className="relative px-4 py-1 w-[106px] flex items-center justify-center">
                     <div
-                        className={`absolute inset-0 rounded-md ${statusIntent.background} opacity-15`}
+                        className={`absolute inset-0 rounded-md ${statusIntent.background}`}
                     ></div>
                     <div className="relative px-2 py-1 rounded-full flex items-center">
                         <span
                             className={`inline-block w-2 h-2 rounded-full mr-2 ${statusIntent.iconColor} ${statusIntent.darkModeIconColor}`}
                         ></span>
                         <span
-                            className={`flex items-center font-semibold pt-0.5 ${statusIntent.textColor} ${statusIntent.darkModeTextColor}`}
+                            className={`flex items-center font-semibold pt-[3px] ${statusIntent.textColor} ${statusIntent.darkModeTextColor}`}
                         >
                             {formattedStatus}
                         </span>
@@ -87,14 +87,14 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
                 </span>
                 <div className="relative inline-block px-4 py-1">
                     <div
-                        className={`absolute inset-0 rounded-md ${statusIntent.background} opacity-15`}
+                        className={`absolute inset-0 rounded-md ${statusIntent.background}`}
                     ></div>
                     <div className="relative px-2 py-1 rounded-full flex items-center">
                         <span
                             className={`inline-block w-2 h-2 rounded-full mr-2 ${statusIntent.iconColor} ${statusIntent.darkModeIconColor}`}
                         ></span>
                         <span
-                            className={`flex items-center font-semibold pt-0.5 ${statusIntent.textColor} ${statusIntent.darkModeTextColor}`}
+                            className={`flex items-center font-semibold pt-[3px] ${statusIntent.textColor} ${statusIntent.darkModeTextColor}`}
                         >
                             {formattedStatus}
                         </span>
@@ -116,25 +116,25 @@ function computeStatusStyles(status: string) {
         };
     } = {
         paid: {
-            background: "bg-green-500",
-            textColor: "text-green-500",
-            darkModeTextColor: "dark:text-green-400",
-            iconColor: "bg-green-500",
-            darkModeIconColor: "dark:bg-green-400",
+            background: "bg-[#F3FDFA] dark:bg-[#202B3F]",
+            textColor: "text-[#33D69F]",
+            darkModeTextColor: "dark:text-[#2EC693]",
+            iconColor: "bg-[#33D69F]",
+            darkModeIconColor: "dark:bg-[#2EC693]",
         },
         pending: {
-            background: "bg-orange-500",
-            textColor: "text-orange-500",
-            darkModeTextColor: "dark:text-orange-400",
-            iconColor: "bg-orange-500",
-            darkModeIconColor: "dark:bg-orange-400",
+            background: "bg-[#FFF9F0] dark:bg-[#2B2736]",
+            textColor: "text-[#FF8F00]",
+            darkModeTextColor: "dark:text-[#FF8F00]",
+            iconColor: "bg-[#FF8F00]",
+            darkModeIconColor: "dark:bg-[#FF8F00]",
         },
         draft: {
-            background: "bg-gray-500",
-            textColor: "text-gray-500",
-            darkModeTextColor: "dark:text-gray-400",
-            iconColor: "bg-gray-500",
-            darkModeIconColor: "dark:bg-gray-400",
+            background: "bg-[#F4F4F5] dark:bg-[#2A2C44]",
+            textColor: "text-[#373B53]",
+            darkModeTextColor: "dark:text-[#DFE3FA]",
+            iconColor: "bg-[#373B53]",
+            darkModeIconColor: "dark:bg-[#DFE3FA]",
         },
     };
 
@@ -142,9 +142,9 @@ function computeStatusStyles(status: string) {
         statusClasses[status] || {
             background: "bg-gray-500",
             textColor: "text-gray-600",
-            darkModeTextColor: "dark:text-gray-700",
-            iconColor: "bg-gray-600",
-            darkModeIconColor: "dark:bg-gray-700",
+            darkModeTextColor: "dark:text-[#DFE3FA]",
+            iconColor: "bg-[#373B53]",
+            darkModeIconColor: "dark:bg-[#DFE3FA]",
         }
     );
 }

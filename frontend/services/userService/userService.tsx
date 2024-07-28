@@ -5,7 +5,6 @@ const api = axios.create({
     withCredentials: true,
 });
 
-// Type guard to check if the error is an AxiosError
 const isAxiosError = (error: unknown): error is AxiosError => {
     return (error as AxiosError).isAxiosError !== undefined;
 };

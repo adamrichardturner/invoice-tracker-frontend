@@ -1,9 +1,10 @@
+// components/InvoiceList/InvoiceList.tsx
 "use client";
 
 import { Invoice } from "@/types/Invoice";
 import { InvoiceCard } from "../InvoiceCard/InvoiceCard";
+import { SkeletonInvoiceCard } from "../InvoiceCard/SkeletonInvoiceCard";
 import Placeholder from "@/assets/ui/empty-illustration.svg";
-import InfinitySpinner from "@/assets/ui/infinitySpinner.svg";
 import Image from "next/image";
 
 interface InvoiceListProps {
@@ -18,22 +19,20 @@ const InvoiceList = ({
     invoicesLoaded,
 }: InvoiceListProps) => {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center pt-[55px] space-y-6">
+        <div className="w-full h-full flex flex-col items-center justify-center py-[55px] space-y-6">
             {loading ? (
-                <div className="flex justify-center items-center h-full w-full">
-                    <Image
-                        src={InfinitySpinner}
-                        alt="Loading..."
-                        width={200}
-                        height={200}
-                    />
-                </div>
+                Array.from({ length: 6 }).map((_, index) => (
+                    <SkeletonInvoiceCard key={index} />
+                ))
             ) : invoicesLoaded && filteredInvoices.length === 0 ? (
-                <div className="flex flex-col justify-center items-center h-full w-full">
+                <div className="flex flex-col justify-center items-center h-full w-full mt-24">
                     <Image src={Placeholder} alt="No invoices found" />
-                    <h3 className="text-heading mt-4">There is nothing here</h3>
-                    <p className="text-center">
-                        Create an invoice by clicking the <br /> New Invoice
+                    <h3 className="text-heading mt-20 font-bold text-3xl">
+                        There is nothing here
+                    </h3>
+                    <p className="text-center text-[#888EB0] dark:text-[#DFE3FA]">
+                        Create an invoice by clicking the <br />{" "}
+                        <span className="font-bold">New Invoice </span>
                         button and get started
                     </p>
                 </div>

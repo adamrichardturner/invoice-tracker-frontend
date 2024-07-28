@@ -12,7 +12,7 @@ export default function InvoicesPage() {
     return (
         <div className="flex min-h-screen md:ml-[103px] items-start pt-[120px] md:pt-[78px] justify-center">
             <Sidebar />
-            <main className="flex flex-col h-full items-center justify-center mx-4">
+            <main className="flex flex-col h-full w-full md:w-[700px] items-center justify-center mx-4">
                 <InvoiceDisplay
                     filteredInvoices={filteredInvoices}
                     invoicesLoaded={invoicesLoaded}

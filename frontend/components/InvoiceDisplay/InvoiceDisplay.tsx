@@ -16,7 +16,7 @@ const InvoiceDisplay = ({
     loading,
 }: InvoiceDisplayProps) => {
     return (
-        <div className="w-full md:w-[740px] h-full">
+        <div className="w-full h-full">
             <InvoiceNav invoiceTotal={filteredInvoices.length} />
             <InvoiceList
                 invoicesLoaded={invoicesLoaded}

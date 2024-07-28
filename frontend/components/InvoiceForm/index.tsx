@@ -62,7 +62,6 @@ const InvoiceFormSchema = z.object({
 export type InvoiceFormSchemaType = z.infer<typeof InvoiceFormSchema>;
 
 const calculateItemTotal = (quantity: number, price: string): number => {
-    // Use parseFloat and handle cases where price is an empty string
     const parsedPrice = parseFloat(price) || 0;
     return quantity * parsedPrice;
 };
@@ -72,15 +71,11 @@ const updateItemTotal = (
     control: Control<InvoiceFormSchemaType>,
     setValue: UseFormSetValue<InvoiceFormSchemaType>,
 ) => {
-    // Ensure quantity and price are valid numbers
     const quantity =
         Number(control._formValues.items[index].item_quantity) || 0;
     const price = control._formValues.items[index].item_price || "0";
-
-    // Calculate the total
     const total = calculateItemTotal(quantity, price);
 
-    // Update the item total in the form
     setValue(`items.${index}.item_total`, total);
 };
 
@@ -168,12 +163,59 @@ export function InvoiceForm({ defaultValues }: InvoiceFormProps) {
         }
     };
 
+    const generateRandomData = () => {
+        const randomNumber = (min: number, max: number) =>
+            Math.floor(Math.random() * (max - min + 1)) + min;
+
+        return {
+            bill_from_street_address: "123 Random St",
+            bill_from_city: "Randomville",
+            bill_from_postcode: "12345",
+            bill_from_country: "Randomland",
+            bill_to_email: `client${randomNumber(1, 1000)}@example.com`,
+            bill_to_name: "Random Client",
+            bill_to_street_address: "456 Client Ave",
+            bill_to_city: "Client City",
+            bill_to_postcode: "67890",
+            bill_to_country: "Clientland",
+            invoice_date: new Date(),
+            payment_terms: ["Net 30 Days", "14 Days", "7 Days"][
+                randomNumber(0, 2)
+            ] as "Net 30 Days" | "14 Days" | "7 Days",
+            project_description: "Random project description",
+            items: [
+                {
+                    item_description: "Random item",
+                    item_quantity: randomNumber(1, 10),
+                    item_price: (randomNumber(100, 1000) / 100).toFixed(2),
+                    item_total: 0,
+                },
+            ],
+            status: "draft" as const,
+        };
+    };
+
+    const handlePopulateRandomData = () => {
+        const randomData = generateRandomData();
+        form.reset(randomData);
+        randomData.items.forEach((_, index) => {
+            updateItemTotal(index, form.control, form.setValue);
+        });
+    };
+
     return (
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8 mb-8 sm:mb-0"
             >
+                <Button
+                    type="button"
+                    onClick={handlePopulateRandomData}
+                    className="bg-[#F9FAFE] dark:bg-[#252945] min-h-[48px] w-full rounded-3xl text-body hover:text-white"
+                >
+                    Populate with Random Data
+                </Button>
                 <div className="space-y-2">
                     <div className="flex flex-col justify-start items-start space-y-3">
                         <h3 className="text-primary font-semibold text-sm tracking-[-0.25px]">

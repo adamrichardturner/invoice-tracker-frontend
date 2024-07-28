@@ -1,6 +1,7 @@
 import { Invoice } from "@/types/Invoice";
 import { addDaysToDateFromTerm } from "@/utils/addDaysToDate";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { SkeletonInvoiceCard } from "./SkeletonInvoiceCard";
 
 interface InvoiceCardProps {
     invoice: Invoice;
@@ -8,26 +9,21 @@ interface InvoiceCardProps {
 
 export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
     if (!invoice) {
-        return null;
+        return <SkeletonInvoiceCard />;
     }
+
     const invoiceDue = addDaysToDateFromTerm(
         invoice.invoice_date,
         invoice.payment_terms,
     );
-
-    const invoiceTotal = (invoice.items || []).reduce((acc, item) => {
-        const itemTotalPrice = item.item_price * item.item_quantity;
-        return acc + itemTotalPrice;
-    }, 0);
-
-    const formattedInvoiceTotal = invoiceTotal.toFixed(2);
 
     const statusIntent = computeStatusStyles(invoice.status);
     const formattedStatus = capitalizeFirstLetter(invoice.status);
 
     return (
         <div className="w-full cursor-pointer bg-invoiceCard rounded-md flex justify-between transition-colors items-center py-[30px] px-4 md:h-[72px] shadow-md border border-transparent md:hover:border md:hover:border-primary">
-            <div className="hidden md:flex flex-row items-center justify-center h-full pl-4">
+            {/* Desktop Card */}
+            <div className="hidden md:flex flex-row items-center w-full flex-1 justify-center h-full pl-4">
                 <span className="flex items-center align-middle h-full leading-none w-[60px]">
                     <span className="flex items-center text-[#7E88C3] dark:text-[#888EB0] pr-0.5">
                         #
@@ -36,34 +32,16 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
                         {invoice.id}
                     </span>
                 </span>
-                <span className="text-[#7E88C3] dark:text-[#DFE3FA] w-[200px] text-sm font-[400]">
+                <span className="text-[#7E88C3] flex-1 dark:text-[#DFE3FA] text-sm font-[400]">
                     Due {invoiceDue}
                 </span>
-                <span className="text-[#858BB2] dark:text-white">
+                <span className="text-[#858BB2] flex items-center text-left flex-1 dark:text-white pl-[62px]">
                     {invoice.bill_to_name}
                 </span>
             </div>
-            <div className="flex md:hidden flex-col items-center justify-start w-full pl-2 space-y-4">
-                <span className="flex justify-start w-full items-center align-middle h-full leading-none">
-                    <span className="flex items-center text-[#7E88C3] dark:text-[#888EB0] pr-0.5">
-                        #
-                    </span>
-                    <span className="flex items-center text-heading font-bold">
-                        {invoice.id}
-                    </span>
-                </span>
-                <div className="flex flex-col w-full items-center">
-                    <span className="text-[#7E88C3] w-full dark:text-[#DFE3FA] text-sm font-[400]">
-                        Due {invoiceDue}
-                    </span>
-                    <span className="text-heading w-full font-bold">
-                        £ {formattedInvoiceTotal}
-                    </span>
-                </div>
-            </div>
-            <div className="text-right hidden md:flex items-center">
-                <span className="text-heading mr-8 font-bold">
-                    £ {formattedInvoiceTotal}
+            <div className="text-right hidden md:flex flex-1 items-center justify-end">
+                <span className="text-heading px-8 font-bold">
+                    £ {invoice.invoice_total.toFixed(2)}
                 </span>
                 <div className="relative px-4 py-1 w-[106px] flex items-center justify-center">
                     <div
@@ -82,6 +60,25 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
                 </div>
                 <div className="ml-4 text-primary text-lg">
                     <MdKeyboardArrowRight />
+                </div>
+            </div>
+            {/* Mobile Card */}
+            <div className="flex md:hidden flex-col items-center justify-start w-full pl-2 space-y-4">
+                <span className="flex justify-start w-full items-center align-middle h-full leading-none">
+                    <span className="flex items-center text-[#7E88C3] dark:text-[#888EB0] pr-0.5">
+                        #
+                    </span>
+                    <span className="flex items-center text-heading font-bold">
+                        {invoice.id}
+                    </span>
+                </span>
+                <div className="flex flex-col w-full items-center">
+                    <span className="text-[#7E88C3] w-full dark:text-[#DFE3FA] text-sm font-[400]">
+                        Due {invoiceDue}
+                    </span>
+                    <span className="text-heading w-full font-bold">
+                        £ {invoice.invoice_total.toFixed(2)}
+                    </span>
                 </div>
             </div>
             <div className="text-right flex flex-col md:hidden items-center space-y-4 pr-2">

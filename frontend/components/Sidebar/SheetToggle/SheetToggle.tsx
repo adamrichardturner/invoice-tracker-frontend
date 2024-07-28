@@ -4,7 +4,7 @@ import React, { forwardRef, Ref } from "react";
 import { useUIStore } from "@/stores/UIState/useUIStore";
 
 const SheetToggle = forwardRef<HTMLDivElement, object>(
-    (props, ref: Ref<HTMLDivElement>) => {
+    (_, ref: Ref<HTMLDivElement>) => {
         const { setSheetOpen, setSelectedEditorMode } = useUIStore((state) => ({
             setSheetOpen: state.setSheetOpen,
             setSelectedEditorMode: state.setSelectedEditorMode,

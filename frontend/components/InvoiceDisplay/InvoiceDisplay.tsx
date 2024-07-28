@@ -1,27 +1,28 @@
 "use client";
 
+import InvoiceNav from "../InvoiceNav/InvoiceNav";
+import InvoiceList from "../InvoiceList/InvoiceList";
 import { Invoice } from "@/types/Invoice";
-import { useUIStore } from "@/stores/UIState/useUIStore";
-import { InvoiceCard } from "../InvoiceCard/InvoiceCard";
 
 interface InvoiceDisplayProps {
-    invoices: Invoice[];
+    filteredInvoices: Invoice[];
+    invoicesLoaded: boolean;
+    loading: boolean;
 }
 
-const InvoiceDisplay = ({ invoices }: InvoiceDisplayProps) => {
-    const selectedFilters = useUIStore((state) => state.selectedFilters);
-    const filteredInvoices =
-        selectedFilters.length > 0
-            ? invoices.filter((invoice) =>
-                  selectedFilters.includes(invoice.status),
-              )
-            : invoices;
-
+const InvoiceDisplay = ({
+    filteredInvoices,
+    invoicesLoaded,
+    loading,
+}: InvoiceDisplayProps) => {
     return (
-        <div className="w-full space-y-6 pt-[55px]">
-            {filteredInvoices.map((invoice) => (
-                <InvoiceCard key={invoice.id} invoice={invoice} />
-            ))}
+        <div className="w-full md:w-[740px] h-full">
+            <InvoiceNav invoiceTotal={filteredInvoices.length} />
+            <InvoiceList
+                invoicesLoaded={invoicesLoaded}
+                filteredInvoices={filteredInvoices}
+                loading={loading}
+            />
         </div>
     );
 };

@@ -1,17 +1,23 @@
-import Sidebar from "@/components/Sidebar/Sidebar";
-import InvoiceNav from "@/components/InvoiceNav/InvoiceNav";
-import { getInvoices } from "@/services/invoiceService";
-import InvoiceDisplay from "@/components/InvoiceDisplay/InvoiceDisplay";
-import { Invoice } from "@/types/Invoice";
+"use client";
 
-export default async function ProtectedPage() {
-    const invoices: Invoice[] = await getInvoices();
+import Sidebar from "@/components/Sidebar/Sidebar";
+import InvoiceDisplay from "@/components/InvoiceDisplay/InvoiceDisplay";
+import useInvoices from "@/hooks/invoices/useInvoices";
+import useFilteredInvoices from "../hooks/invoices/useFilteredInvoices";
+
+export default function InvoicesPage() {
+    const { loading, invoicesLoaded } = useInvoices();
+    const { filteredInvoices } = useFilteredInvoices();
+
     return (
         <div className="flex min-h-screen md:ml-[103px] items-start pt-[120px] md:pt-[78px] justify-center">
             <Sidebar />
-            <main className="flex flex-col w-full md:w-[740px] items-center justify-center mx-4">
-                <InvoiceNav invoiceTotal={invoices.length} />
-                <InvoiceDisplay invoices={invoices} />
+            <main className="flex flex-col h-full items-center justify-center mx-4">
+                <InvoiceDisplay
+                    filteredInvoices={filteredInvoices}
+                    invoicesLoaded={invoicesLoaded}
+                    loading={loading}
+                />
             </main>
         </div>
     );

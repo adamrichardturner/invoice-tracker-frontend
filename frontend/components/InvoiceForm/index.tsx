@@ -16,7 +16,8 @@ import { DatePicker } from "@/components/DatePicker";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { FaTrash } from "react-icons/fa";
 import { PaymentTermsDropdown } from "./PaymentTermsDropdown";
-import { createInvoice } from "@/services/invoiceService";
+import useInvoices from "@/hooks/invoices/useInvoices";
+import { toast } from "sonner";
 
 const InvoiceFormSchema = z.object({
     bill_from_street_address: z.string().min(1, "Street address is required"),
@@ -55,12 +56,15 @@ const InvoiceFormSchema = z.object({
             }),
         )
         .min(1, "At least one item is required"),
+    status: z.enum(["draft", "pending", "paid"]),
 });
 
 export type InvoiceFormSchemaType = z.infer<typeof InvoiceFormSchema>;
 
 const calculateItemTotal = (quantity: number, price: string): number => {
-    return quantity * parseFloat(price);
+    // Use parseFloat and handle cases where price is an empty string
+    const parsedPrice = parseFloat(price) || 0;
+    return quantity * parsedPrice;
 };
 
 const updateItemTotal = (
@@ -68,19 +72,30 @@ const updateItemTotal = (
     control: Control<InvoiceFormSchemaType>,
     setValue: UseFormSetValue<InvoiceFormSchemaType>,
 ) => {
-    const quantity = control._formValues.items[index].item_quantity;
-    const price = control._formValues.items[index].item_price;
+    // Ensure quantity and price are valid numbers
+    const quantity =
+        Number(control._formValues.items[index].item_quantity) || 0;
+    const price = control._formValues.items[index].item_price || "0";
+
+    // Calculate the total
     const total = calculateItemTotal(quantity, price);
+
+    // Update the item total in the form
     setValue(`items.${index}.item_total`, total);
 };
 
-export function InvoiceForm() {
+interface InvoiceFormProps {
+    defaultValues?: Partial<InvoiceFormSchemaType>;
+}
+
+export function InvoiceForm({ defaultValues }: InvoiceFormProps) {
     const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
+    const { addInvoice } = useInvoices();
 
     const form = useForm<InvoiceFormSchemaType>({
         mode: "onSubmit",
         resolver: zodResolver(InvoiceFormSchema),
-        defaultValues: {
+        defaultValues: defaultValues || {
             bill_from_street_address: "",
             bill_from_city: "",
             bill_from_postcode: "",
@@ -102,6 +117,7 @@ export function InvoiceForm() {
                     item_total: 0,
                 },
             ],
+            status: "draft",
         },
     });
 
@@ -109,8 +125,6 @@ export function InvoiceForm() {
         control: form.control,
         name: "items",
     });
-
-    console.log("FORM ERRORS: ", form.formState.errors);
 
     useEffect(() => {
         const subscription = form.watch((_, { name }) => {
@@ -128,14 +142,20 @@ export function InvoiceForm() {
 
     const onSubmit = async (data: InvoiceFormSchemaType) => {
         try {
-            console.log(data);
-            const response = await createInvoice(data);
-            console.log("Invoice created successfully:", response);
+            await addInvoice(data);
+
             setIsSubmitSuccessful(true);
         } catch (error) {
-            console.error("Error submitting form:", error);
+            setTimeout(() => {
+                toast("Failed to create invoice");
+            }, 1000);
             setIsSubmitSuccessful(false);
         }
+    };
+
+    const handleSubmit = (status: "draft" | "pending") => {
+        form.setValue("status", status);
+        form.handleSubmit(onSubmit)();
     };
 
     const handlePriceInput = (
@@ -175,55 +195,59 @@ export function InvoiceForm() {
                                 </FormItem>
                             )}
                         />
-                        <div className="flex flex-row items-center gap-4">
-                            <FormField
-                                control={form.control}
-                                name="bill_from_city"
-                                render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>City</FormLabel>
-                                        <Input
-                                            {...field}
-                                            error={Boolean(
-                                                form.formState.errors
-                                                    .bill_from_city,
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="bill_from_postcode"
-                                render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>Post Code</FormLabel>
-                                        <Input
-                                            {...field}
-                                            error={Boolean(
-                                                form.formState.errors
-                                                    .bill_from_postcode,
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="bill_from_country"
-                                render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>Country</FormLabel>
-                                        <Input
-                                            {...field}
-                                            error={Boolean(
-                                                form.formState.errors
-                                                    .bill_from_country,
-                                            )}
-                                        />
-                                    </FormItem>
-                                )}
-                            />
+                        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                            <div className="flex flex-row gap-4 w-full md:w-auto">
+                                <FormField
+                                    control={form.control}
+                                    name="bill_from_city"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>City</FormLabel>
+                                            <Input
+                                                {...field}
+                                                error={Boolean(
+                                                    form.formState.errors
+                                                        .bill_from_city,
+                                                )}
+                                            />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="bill_from_postcode"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Post Code</FormLabel>
+                                            <Input
+                                                {...field}
+                                                error={Boolean(
+                                                    form.formState.errors
+                                                        .bill_from_postcode,
+                                                )}
+                                            />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex flex-row gap-4 w-full md:w-auto flex-auto">
+                                <FormField
+                                    control={form.control}
+                                    name="bill_from_country"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Country</FormLabel>
+                                            <Input
+                                                {...field}
+                                                error={Boolean(
+                                                    form.formState.errors
+                                                        .bill_from_country,
+                                                )}
+                                            />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -278,79 +302,88 @@ export function InvoiceForm() {
                             </FormItem>
                         )}
                     />
-                    <div className="flex flex-row items-center gap-4">
-                        <FormField
-                            control={form.control}
-                            name="bill_to_city"
-                            render={({ field }) => (
-                                <FormItem className="flex-1">
-                                    <FormLabel>City</FormLabel>
-                                    <Input
-                                        {...field}
-                                        error={Boolean(
-                                            form.formState.errors.bill_to_city,
-                                        )}
-                                    />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="bill_to_postcode"
-                            render={({ field }) => (
-                                <FormItem className="flex-1">
-                                    <FormLabel>Post Code</FormLabel>
-                                    <Input
-                                        {...field}
-                                        error={Boolean(
-                                            form.formState.errors
-                                                .bill_to_postcode,
-                                        )}
-                                    />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="bill_to_country"
-                            render={({ field }) => (
-                                <FormItem className="flex-1">
-                                    <FormLabel>Country</FormLabel>
-                                    <Input
-                                        {...field}
-                                        error={Boolean(
-                                            form.formState.errors
-                                                .bill_to_country,
-                                        )}
-                                    />
-                                </FormItem>
-                            )}
-                        />
+                    <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                        <div className="flex flex-row gap-4 w-full md:w-auto">
+                            <FormField
+                                control={form.control}
+                                name="bill_to_city"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormLabel>City</FormLabel>
+                                        <Input
+                                            {...field}
+                                            error={Boolean(
+                                                form.formState.errors
+                                                    .bill_to_city,
+                                            )}
+                                        />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="bill_to_postcode"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormLabel>Post Code</FormLabel>
+                                        <Input
+                                            {...field}
+                                            error={Boolean(
+                                                form.formState.errors
+                                                    .bill_to_postcode,
+                                            )}
+                                        />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="flex flex-row gap-4 w-full md:w-auto flex-auto">
+                            <FormField
+                                control={form.control}
+                                name="bill_to_country"
+                                render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormLabel>Country</FormLabel>
+                                        <Input
+                                            {...field}
+                                            error={Boolean(
+                                                form.formState.errors
+                                                    .bill_to_country,
+                                            )}
+                                        />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    <div className="flex flex-row gap-4 justify-center">
-                        <DatePicker
-                            control={form.control}
-                            name="invoice_date"
-                            label="Invoice Date"
-                        />
-                        <FormField
-                            control={form.control}
-                            name="payment_terms"
-                            render={() => (
-                                <FormItem className="w-1/2 flex items-start flex-col text-left">
-                                    <FormLabel className="mb-2">
-                                        Payment Terms
-                                    </FormLabel>
-                                    <PaymentTermsDropdown
-                                        control={form.control}
-                                        name="payment_terms"
-                                    />
-                                </FormItem>
-                            )}
-                        />
+                    <div className="flex flex-col md:flex-row gap-4 w-full">
+                        <div className="w-full md:w-1/2">
+                            <DatePicker
+                                control={form.control}
+                                name="invoice_date"
+                                label="Invoice Date"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/2">
+                            <FormField
+                                control={form.control}
+                                name="payment_terms"
+                                render={() => (
+                                    <FormItem className="w-full flex items-start flex-col text-left">
+                                        <FormLabel className="mb-2">
+                                            Payment Terms
+                                        </FormLabel>
+                                        <PaymentTermsDropdown
+                                            control={form.control}
+                                            name="payment_terms"
+                                        />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                     </div>
 
                     <FormField
@@ -374,105 +407,114 @@ export function InvoiceForm() {
                     </h3>
                     {(fields ?? []).map((item, index) => (
                         <div key={item.id} className="space-y-4">
-                            <div className="flex flex-row items-center gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name={`items.${index}.item_description`}
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormLabel>Item Name</FormLabel>
-                                            <Input
-                                                {...field}
-                                                className="w-[180px]"
-                                                error={Boolean(
-                                                    form.formState.errors
-                                                        .items?.[index]
-                                                        ?.item_description,
-                                                )}
-                                            />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`items.${index}.item_quantity`}
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormLabel>Qty.</FormLabel>
-                                            <Input
-                                                type="number"
-                                                className="flex items-center justify-center"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(
-                                                        parseFloat(
-                                                            e.target.value,
-                                                        ),
-                                                    );
-                                                    updateItemTotal(
-                                                        index,
-                                                        form.control,
-                                                        form.setValue,
-                                                    );
-                                                }}
-                                                min="1"
-                                                error={Boolean(
-                                                    form.formState.errors
-                                                        .items?.[index]
-                                                        ?.item_quantity,
-                                                )}
-                                            />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`items.${index}.item_price`}
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormLabel>Price</FormLabel>
-                                            <Input
-                                                type="text"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    handlePriceInput(e, field);
-                                                    updateItemTotal(
-                                                        index,
-                                                        form.control,
-                                                        form.setValue,
-                                                    );
-                                                }}
-                                                error={Boolean(
-                                                    form.formState.errors
-                                                        .items?.[index]
-                                                        ?.item_price,
-                                                )}
-                                            />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`items.${index}.item_total`}
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormLabel>Item Total</FormLabel>
-                                            <Input
-                                                {...field}
-                                                readOnly
-                                                value={field.value.toFixed(2)}
-                                            />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={() => remove(index)}
-                                    className="bg-transparent hover:bg-transparent text-[#888EB0] p-0 mt-3 flex items-center justify-center"
-                                    disabled={fields.length <= 1}
-                                >
-                                    <FaTrash />
-                                </Button>
+                            <div className="flex flex-col md:flex-row items-center gap-4">
+                                <div className="w-full">
+                                    <FormField
+                                        control={form.control}
+                                        name={`items.${index}.item_description`}
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1 w-full">
+                                                <FormLabel>Item Name</FormLabel>
+                                                <Input
+                                                    {...field}
+                                                    className="w-full"
+                                                    error={Boolean(
+                                                        form.formState.errors
+                                                            .items?.[index]
+                                                            ?.item_description,
+                                                    )}
+                                                />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="flex gap-4 items-center">
+                                    <FormField
+                                        control={form.control}
+                                        name={`items.${index}.item_quantity`}
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormLabel>Qty.</FormLabel>
+                                                <Input
+                                                    type="number"
+                                                    className="flex items-center justify-center"
+                                                    {...field}
+                                                    onChange={(e) => {
+                                                        field.onChange(
+                                                            parseFloat(
+                                                                e.target.value,
+                                                            ),
+                                                        );
+                                                        updateItemTotal(
+                                                            index,
+                                                            form.control,
+                                                            form.setValue,
+                                                        );
+                                                    }}
+                                                    min="1"
+                                                    error={Boolean(
+                                                        form.formState.errors
+                                                            .items?.[index]
+                                                            ?.item_quantity,
+                                                    )}
+                                                />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`items.${index}.item_price`}
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormLabel>Price</FormLabel>
+                                                <Input
+                                                    type="text"
+                                                    {...field}
+                                                    onChange={(e) => {
+                                                        handlePriceInput(
+                                                            e,
+                                                            field,
+                                                        );
+                                                        updateItemTotal(
+                                                            index,
+                                                            form.control,
+                                                            form.setValue,
+                                                        );
+                                                    }}
+                                                    error={Boolean(
+                                                        form.formState.errors
+                                                            .items?.[index]
+                                                            ?.item_price,
+                                                    )}
+                                                />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`items.${index}.item_total`}
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormLabel>Total</FormLabel>
+                                                <Input
+                                                    {...field}
+                                                    readOnly
+                                                    value={field.value.toFixed(
+                                                        2,
+                                                    )}
+                                                />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={() => remove(index)}
+                                        className="bg-transparent hover:bg-transparent text-[#888EB0] mt-[20px] p-0 flex items-center justify-center"
+                                        disabled={fields.length <= 1}
+                                    >
+                                        <FaTrash />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -486,7 +528,7 @@ export function InvoiceForm() {
                                 item_total: 0,
                             })
                         }
-                        className="bg-foreground w-full rounded-3xl text-body hover:text-white"
+                        className="bg-[#F9FAFE] dark:bg-[#252945] min-h-[48px] w-full rounded-3xl text-body hover:text-white"
                     >
                         + Add New Item
                     </Button>
@@ -497,24 +539,48 @@ export function InvoiceForm() {
                     )}
                 </div>
 
-                <div className="flex items-end justify-end">
-                    {isSubmitSuccessful ? (
-                        <SheetClose asChild>
-                            <Button
-                                type="submit"
-                                className="bg-primary-foreground rounded-3xl text-white"
-                            >
-                                Save changes
-                            </Button>
-                        </SheetClose>
-                    ) : (
-                        <Button
-                            type="submit"
-                            className="bg-primary-foreground rounded-3xl text-white"
-                        >
-                            Save changes
-                        </Button>
-                    )}
+                <div className="flex justify-between">
+                    <SheetClose>
+                        <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
+                            Discard
+                        </div>
+                    </SheetClose>
+
+                    <div className="flex space-x-3">
+                        <div className="flex items-end justify-end">
+                            {isSubmitSuccessful ? (
+                                <SheetClose asChild>
+                                    <div
+                                        onClick={() => handleSubmit("draft")}
+                                        className="bg-[#373B53] dark:bg-[#373B53] pt-[3px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+                                    >
+                                        Save as Draft
+                                    </div>
+                                </SheetClose>
+                            ) : (
+                                <SheetClose asChild>
+                                    <div
+                                        onClick={() => handleSubmit("draft")}
+                                        className="bg-[#373B53] dark:bg-[#373B53] pt-[3px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+                                    >
+                                        Save as Draft
+                                    </div>
+                                </SheetClose>
+                            )}
+                        </div>
+
+                        <div className="flex items-end justify-end">
+                            <SheetClose asChild>
+                                <Button
+                                    onClick={() => handleSubmit("pending")}
+                                    type="button"
+                                    className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center"
+                                >
+                                    Save & Send
+                                </Button>
+                            </SheetClose>
+                        </div>
+                    </div>
                 </div>
             </form>
         </Form>

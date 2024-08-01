@@ -2,7 +2,7 @@ import { Invoice } from "@/types/Invoice";
 import { addDaysToDateFromTerm } from "@/utils/addDaysToDate";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { SkeletonInvoiceCard } from "./SkeletonInvoiceCard";
-
+import Link from "next/link";
 interface InvoiceCardProps {
     invoice: Invoice;
 }
@@ -21,7 +21,10 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
     const formattedStatus = capitalizeFirstLetter(invoice.status);
 
     return (
-        <div className="w-full cursor-pointer bg-invoiceCard rounded-md flex justify-between transition-colors items-center py-[30px] px-4 md:h-[72px] shadow-md border border-transparent md:hover:border md:hover:border-primary">
+        <Link
+            href={`/invoice/${invoice.id}`}
+            className="w-full cursor-pointer bg-invoiceCard rounded-md flex justify-between transition-colors items-center py-[30px] px-4 md:h-[72px] shadow-md border border-transparent md:hover:border md:hover:border-primary"
+        >
             {/* Desktop Card */}
             <div className="hidden md:flex flex-row items-center w-full flex-1 justify-center h-full pl-4">
                 <span className="flex items-center align-middle h-full leading-none w-[60px]">
@@ -101,11 +104,11 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 };
 
-function computeStatusStyles(status: string) {
+export function computeStatusStyles(status: string) {
     const statusClasses: {
         [key: string]: {
             background: string;
@@ -149,6 +152,6 @@ function computeStatusStyles(status: string) {
     );
 }
 
-function capitalizeFirstLetter(str: string): string {
+export function capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }

@@ -18,6 +18,7 @@ import { FaTrash } from "react-icons/fa";
 import { PaymentTermsDropdown } from "./PaymentTermsDropdown";
 import useInvoices from "@/hooks/invoices/useInvoices";
 import { toast } from "sonner";
+import { useInvoicesStore } from "@/stores/InvoicesState/useInvoicesStore";
 
 const InvoiceFormSchema = z.object({
     bill_from_street_address: z.string().min(1, "Street address is required"),
@@ -52,7 +53,7 @@ const InvoiceFormSchema = z.object({
                         message:
                             "Must be a number with up to two decimal places",
                     }),
-                item_total: z.number(),
+                item_total: z.number().default(0),
             }),
         )
         .min(1, "At least one item is required"),
@@ -79,41 +80,46 @@ const updateItemTotal = (
     setValue(`items.${index}.item_total`, total);
 };
 
-interface InvoiceFormProps {
-    defaultValues?: Partial<InvoiceFormSchemaType>;
-}
-
-export function InvoiceForm({ defaultValues }: InvoiceFormProps) {
+export function InvoiceForm() {
     const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
     const { addInvoice } = useInvoices();
+    const selectedInvoice = useInvoicesStore((state) => state.selectedInvoice);
 
     const form = useForm<InvoiceFormSchemaType>({
         mode: "onSubmit",
         resolver: zodResolver(InvoiceFormSchema),
-        defaultValues: defaultValues || {
-            bill_from_street_address: "",
-            bill_from_city: "",
-            bill_from_postcode: "",
-            bill_from_country: "",
-            bill_to_email: "",
-            bill_to_name: "",
-            bill_to_street_address: "",
-            bill_to_city: "",
-            bill_to_postcode: "",
-            bill_to_country: "",
-            invoice_date: new Date(),
-            payment_terms: "Net 30 Days",
-            project_description: "",
-            items: [
-                {
-                    item_description: "",
-                    item_quantity: 1,
-                    item_price: "0",
-                    item_total: 0,
-                },
-            ],
-            status: "draft",
-        },
+        defaultValues: selectedInvoice
+            ? {
+                  ...selectedInvoice,
+                  items: selectedInvoice.items.map((item) => ({
+                      ...item,
+                      item_total: parseFloat(item.item_total.toString()),
+                  })),
+              }
+            : {
+                  bill_from_street_address: "",
+                  bill_from_city: "",
+                  bill_from_postcode: "",
+                  bill_from_country: "",
+                  bill_to_email: "",
+                  bill_to_name: "",
+                  bill_to_street_address: "",
+                  bill_to_city: "",
+                  bill_to_postcode: "",
+                  bill_to_country: "",
+                  invoice_date: new Date(),
+                  payment_terms: "Net 30 Days",
+                  project_description: "",
+                  items: [
+                      {
+                          item_description: "",
+                          item_quantity: 1,
+                          item_price: "0",
+                          item_total: 0,
+                      },
+                  ],
+                  status: "draft",
+              },
     });
 
     const { fields, append, remove } = useFieldArray({

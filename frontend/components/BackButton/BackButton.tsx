@@ -18,10 +18,10 @@ export default function BackButton({ path }: BackButtonProps) {
     return (
         <div
             onClick={onClickBack}
-            className="flex space-x-4 w-full items-center pb-8"
+            className="flex space-x-4 w-full items-center pb-8 cursor-pointer"
         >
             <MdKeyboardArrowLeft className="text-primary" />
-            <span className="text-[#0C0E16] dark:text-white text-sm">
+            <span className="text-[#0C0E16] dark:text-white text-sm font-semibold">
                 Go back
             </span>
         </div>

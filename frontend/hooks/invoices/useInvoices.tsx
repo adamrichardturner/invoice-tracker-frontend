@@ -12,7 +12,13 @@ const useInvoices = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [invoicesLoaded, setInvoicesLoaded] = useState(true);
-    const { invoices, addInvoices, addSingleInvoice } = useInvoicesStore();
+    const {
+        invoices,
+        addInvoices,
+        addSingleInvoice,
+        selectedInvoiceId,
+        setSelectedInvoiceId,
+    } = useInvoicesStore();
 
     const getSingleInvoice = useCallback(async (id: string) => {
         setLoading(true);
@@ -86,6 +92,8 @@ const useInvoices = () => {
         addInvoice,
         getSingleInvoice,
         invoicesLoaded,
+        selectedInvoiceId,
+        setSelectedInvoiceId,
     };
 };
 

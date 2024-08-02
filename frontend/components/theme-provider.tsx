@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     const path = usePathname();
     const isAuthPage = path === "/auth/login" || path === "/auth/register";
-    console.log("PATH ", path);
+
     return (
         <NextThemesProvider {...props}>
             {!isAuthPage && <Sidebar />}

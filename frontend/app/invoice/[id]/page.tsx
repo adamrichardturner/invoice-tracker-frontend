@@ -11,8 +11,7 @@ type Props = {
 
 export default async function InvoicePage({ params }: Props) {
     const { id } = params;
-    const res = await getInvoiceById(id);
-    const invoice: Invoice = await res;
+    const invoice: Invoice = await getInvoiceById(id);
 
     if (!invoice) {
         return <div>Invoice not found</div>;
@@ -22,7 +21,7 @@ export default async function InvoicePage({ params }: Props) {
         <div className="flex min-h-screen md:ml-[103px] items-start pt-[120px] md:pt-[65px] justify-center">
             <main className="flex flex-col h-full w-full md:w-[768px] items-center justify-center mx-4">
                 <BackButton path="/" />
-                <InvoiceSingleNav status={invoice.status} id={id} />
+                <InvoiceSingleNav invoice={invoice} />
             </main>
         </div>
     );

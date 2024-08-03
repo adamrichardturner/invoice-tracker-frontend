@@ -36,13 +36,12 @@ export default function RegisterForm() {
       router.push("/auth/login");
     } catch (error) {
       console.error("Registration error:", error);
-      // Optionally, you can add user feedback here
     }
   };
 
   return (
     <div className="max-w-full md:w-[480px] space-y-10 py-10 bg-foreground p-8 rounded-lg shadow-lg">
-      <div className="space-y-8 text-center">
+      <div className="space-y-2 text-center">
         <div className="flex flex-col justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +68,7 @@ export default function RegisterForm() {
           <div className="space-y-2 text-heading">
             <Label htmlFor="username">Username</Label>
             <Input
-              className="bg-foreground"
+              className="bg-foreground border dark:border-white"
               id="username"
               {...register("username")}
               required
@@ -81,7 +80,7 @@ export default function RegisterForm() {
           <div className="space-y-2 text-heading">
             <Label htmlFor="email">Email</Label>
             <Input
-              className="bg-foreground"
+              className="bg-foreground border dark:border-white"
               id="email"
               type="email"
               {...register("email")}
@@ -94,7 +93,7 @@ export default function RegisterForm() {
           <div className="space-y-2 text-heading">
             <Label htmlFor="password">Password</Label>
             <Input
-              className="bg-foreground"
+              className="bg-foreground border dark:border-white"
               id="password"
               type="password"
               {...register("password")}

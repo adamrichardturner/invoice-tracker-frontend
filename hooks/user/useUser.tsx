@@ -15,17 +15,6 @@ const saveSession = (user: User, cookie: string) => {
   sessionStorage.setItem(COOKIE_KEY, cookie);
 };
 
-const loadSession = () => {
-  const user = sessionStorage.getItem(USER_KEY);
-  const cookie = sessionStorage.getItem(COOKIE_KEY);
-  if (!user || user === "undefined" || !cookie) return null;
-  try {
-    return { user: JSON.parse(user), cookie };
-  } catch (error) {
-    return null;
-  }
-};
-
 const clearSession = () => {
   sessionStorage.removeItem(USER_KEY);
   sessionStorage.removeItem(COOKIE_KEY);
@@ -67,7 +56,7 @@ const useUser = () => {
   const register = useCallback(
     async (username: string, email: string, password: string) => {
       try {
-        clearSession(); // Clear session before registering
+        clearSession();
         const response = await registerUser(username, email, password);
         const user = response.user;
         const cookie = response.sessionID;
@@ -86,6 +75,27 @@ const useUser = () => {
     [setUser, router],
   );
 
+  const loginWithDemoAccount = useCallback(async () => {
+    try {
+      clearSession();
+      const email = "demo@demo.com";
+      const password = "demo123";
+      const response = await login(email, password);
+      const user = response.user;
+      const cookie = response.sessionID;
+      setUser(user);
+      saveSession(user, cookie);
+      router.push("/");
+    } catch (error: unknown) {
+      if (isAxiosError(error)) {
+        throw new Error(error.message);
+      } else if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error("An unknown error occurred during login");
+    }
+  }, [setUser, router]);
+
   const logout = useCallback(() => {
     setUser(null);
     clearSession();
@@ -98,6 +108,7 @@ const useUser = () => {
     loginWithPassword,
     register,
     logout,
+    loginWithDemoAccount,
   };
 };
 

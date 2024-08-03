@@ -11,6 +11,7 @@ import Link from "next/link";
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
+  loginWithDemoAccount: () => void;
 }
 
 const schema = z.object({
@@ -20,7 +21,10 @@ const schema = z.object({
 
 type LoginFormData = z.infer<typeof schema>;
 
-export default function LoginForm({ onLogin }: LoginFormProps) {
+export default function LoginForm({
+  onLogin,
+  loginWithDemoAccount,
+}: LoginFormProps) {
   const {
     register,
     handleSubmit,
@@ -35,7 +39,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
   return (
     <div className="max-w-full md:w-[480px] space-y-10 py-10 bg-foreground p-8 rounded-lg shadow-lg">
-      <div className="space-y-8 text-center">
+      <div className="space-y-2 text-center">
         <div className="flex flex-col justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +66,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           <div className="space-y-2 text-heading">
             <Label htmlFor="email">Email</Label>
             <Input
-              className="bg-foreground"
+              className="bg-foreground border dark:border-white"
               id="email"
               type="email"
               {...register("email")}
@@ -75,7 +79,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           <div className="space-y-2 text-heading">
             <Label htmlFor="password">Password</Label>
             <Input
-              className="bg-foreground"
+              className="bg-foreground dark:border-white"
               id="password"
               type="password"
               {...register("password")}
@@ -97,7 +101,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
       <div className="space-y-4 text-heading dark:text-secondaryBody">
         <Button
           variant="outline"
-          className="w-full bg-foreground dark:hover:text-black rounded-roundedBtn"
+          className="w-full bg-foreground dark:bg-white dark:text-black dark:hover:text-black rounded-roundedBtn"
+          onClick={loginWithDemoAccount}
         >
           <FaWrench className="h-5 w-5 mr-2" />
           Login as Demo User

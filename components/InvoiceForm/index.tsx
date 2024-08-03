@@ -62,28 +62,16 @@ const InvoiceFormSchema = z.object({
 
 export type InvoiceFormSchemaType = z.infer<typeof InvoiceFormSchema>;
 
-const calculateItemTotal = (quantity: number, price: string): number => {
-  const parsedPrice = parseFloat(price) || 0;
-  return quantity * parsedPrice;
-};
-
-const updateItemTotal = (
-  index: number,
-  control: Control<InvoiceFormSchemaType>,
-  setValue: UseFormSetValue<InvoiceFormSchemaType>,
-) => {
-  const quantity = Number(control._formValues.items[index].item_quantity) || 0;
-  const price = control._formValues.items[index].item_price || "0";
-  const total = calculateItemTotal(quantity, price);
-
-  setValue(`items.${index}.item_total`, total);
-};
-
 export function InvoiceForm() {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"draft" | "pending">(
+    "draft",
+  );
   const selectedInvoice = useInvoicesStore((state) => state.selectedInvoice);
   const selectedEditorMode = useUIStore((state) => state.selectedEditorMode);
   const { updateSelectedInvoice, addInvoice } = useSelectedInvoice();
+  const setSheetOpen = useUIStore((state) => state.setSheetOpen);
 
   const form = useForm<InvoiceFormSchemaType>({
     mode: "onSubmit",
@@ -142,48 +130,23 @@ export function InvoiceForm() {
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
-  const onSubmit = async (data: InvoiceFormSchemaType) => {
+  const handleSubmit = async (data: InvoiceFormSchemaType) => {
+    setIsSubmitting(true);
+    data.status = submitStatus;
+
     try {
-      await addInvoice(data);
-      setIsSubmitSuccessful(true);
-      setTimeout(() => {
-        const closeButton = document.querySelector(
-          ".sheet-close-button",
-        ) as HTMLElement;
-        if (closeButton) closeButton.click();
-      }, 300);
-    } catch (error) {
-      setTimeout(() => {
-        toast("Failed to create invoice");
-      }, 1000);
-      setIsSubmitSuccessful(false);
-    }
-  };
-
-  const handleSubmit = async (
-    status: "draft" | "pending",
-    editorMode: "edit" | "create",
-  ) => {
-    form.setValue("status", status);
-
-    if (editorMode === "create") {
-      form.handleSubmit(onSubmit)();
-    } else if (editorMode === "edit") {
-      try {
-        await updateSelectedInvoice(form.getValues());
-        setIsSubmitSuccessful(true);
-        setTimeout(() => {
-          const closeButton = document.querySelector(
-            ".sheet-close-button",
-          ) as HTMLElement;
-          if (closeButton) closeButton.click();
-        }, 300);
-      } catch (error) {
-        setTimeout(() => {
-          toast("Failed to update invoice");
-        }, 1000);
-        setIsSubmitSuccessful(false);
+      if (selectedEditorMode === "create") {
+        await addInvoice(data);
+      } else if (selectedEditorMode === "edit") {
+        await updateSelectedInvoice(data);
       }
+      setIsSubmitSuccessful(true);
+      setSheetOpen(false);
+    } catch (error) {
+      toast("Failed to submit invoice");
+      setIsSubmitSuccessful(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -197,38 +160,6 @@ export function InvoiceForm() {
     }
   };
 
-  const generateRandomData = () => {
-    const randomNumber = (min: number, max: number) =>
-      Math.floor(Math.random() * (max - min + 1)) + min;
-
-    return {
-      bill_from_street_address: "123 Random St",
-      bill_from_city: "Randomville",
-      bill_from_postcode: "12345",
-      bill_from_country: "Randomland",
-      bill_to_email: `client${randomNumber(1, 1000)}@example.com`,
-      bill_to_name: "Random Client",
-      bill_to_street_address: "456 Client Ave",
-      bill_to_city: "Client City",
-      bill_to_postcode: "67890",
-      bill_to_country: "Clientland",
-      invoice_date: new Date(),
-      payment_terms: ["Net 30 Days", "14 Days", "7 Days"][
-        randomNumber(0, 2)
-      ] as "Net 30 Days" | "14 Days" | "7 Days",
-      project_description: "Random project description",
-      items: [
-        {
-          item_description: "Random item",
-          item_quantity: randomNumber(1, 10),
-          item_price: (randomNumber(100, 1000) / 100).toFixed(2),
-          item_total: 0,
-        },
-      ],
-      status: "draft" as const,
-    };
-  };
-
   const handlePopulateRandomData = () => {
     const randomData = generateRandomData();
     form.reset(randomData);
@@ -240,7 +171,7 @@ export function InvoiceForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-8 mb-8 sm:mb-0"
       >
         {selectedEditorMode === "create" && (
@@ -566,96 +497,95 @@ export function InvoiceForm() {
           )}
         </div>
 
-        {selectedEditorMode === "create" && (
-          <div className="flex justify-between">
-            <SheetClose>
-              <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
-                Discard
-              </div>
-            </SheetClose>
-
-            <div className="flex space-x-3">
-              <div className="flex items-end justify-end">
-                {isSubmitSuccessful ? (
-                  <SheetClose asChild>
-                    <Button
-                      onClick={() => handleSubmit("draft", "create")}
-                      disabled={!form.formState.isDirty}
-                      className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
-                    >
-                      Save as Draft
-                    </Button>
-                  </SheetClose>
-                ) : (
-                  <Button
-                    onClick={() => handleSubmit("draft", "create")}
-                    disabled={!form.formState.isDirty}
-                    className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
-                  >
-                    Save as Draft
-                  </Button>
-                )}
-              </div>
-
-              <div className="flex items-end justify-end">
-                {isSubmitSuccessful ? (
-                  <SheetClose asChild>
-                    <Button
-                      onClick={() => handleSubmit("pending", "create")}
-                      disabled={!form.formState.isDirty}
-                      type="button"
-                      className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
-                    >
-                      Save & Send
-                    </Button>
-                  </SheetClose>
-                ) : (
-                  <Button
-                    onClick={() => handleSubmit("pending", "create")}
-                    disabled={!form.formState.isDirty}
-                    type="button"
-                    className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
-                  >
-                    Save & Send
-                  </Button>
-                )}
-              </div>
+        <div className="flex justify-between">
+          <SheetClose>
+            <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
+              Discard
             </div>
-          </div>
-        )}
-        {selectedEditorMode === "edit" && (
-          <div className="flex justify-end space-x-3">
-            <SheetClose asChild>
-              <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center sheet-close-button">
-                Cancel
-              </div>
-            </SheetClose>
+          </SheetClose>
+
+          <div className="flex space-x-3">
             <div className="flex items-end justify-end">
-              {isSubmitSuccessful ? (
-                <SheetClose asChild>
-                  <Button
-                    onClick={() => handleSubmit("pending", "edit")}
-                    disabled={!form.formState.isDirty}
-                    type="button"
-                    className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center"
-                  >
-                    Save Changes
-                  </Button>
-                </SheetClose>
-              ) : (
-                <Button
-                  onClick={() => handleSubmit("pending", "edit")}
-                  type="button"
-                  disabled={!form.formState.isDirty}
-                  className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center"
-                >
-                  Save Changes
-                </Button>
-              )}
+              <Button
+                type="button"
+                onClick={() => {
+                  setSubmitStatus("draft");
+                  form.handleSubmit(handleSubmit)();
+                }}
+                disabled={isSubmitting}
+                className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+              >
+                Save as Draft
+              </Button>
+            </div>
+
+            <div className="flex items-end justify-end">
+              <Button
+                type="button"
+                onClick={() => {
+                  setSubmitStatus("pending");
+                  form.handleSubmit(handleSubmit)();
+                }}
+                disabled={isSubmitting}
+                className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
+              >
+                Save & Send
+              </Button>
             </div>
           </div>
-        )}
+        </div>
       </form>
     </Form>
   );
+}
+
+// Helper Functions
+function calculateItemTotal(quantity: number, price: string): number {
+  const parsedPrice = parseFloat(price) || 0;
+  return quantity * parsedPrice;
+}
+
+function updateItemTotal(
+  index: number,
+  control: Control<InvoiceFormSchemaType>,
+  setValue: UseFormSetValue<InvoiceFormSchemaType>,
+) {
+  const quantity = Number(control._formValues.items[index].item_quantity) || 0;
+  const price = control._formValues.items[index].item_price || "0";
+  const total = calculateItemTotal(quantity, price);
+
+  setValue(`items.${index}.item_total`, total);
+}
+
+function generateRandomData() {
+  const randomNumber = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+  return {
+    bill_from_street_address: "123 Random St",
+    bill_from_city: "Randomville",
+    bill_from_postcode: "12345",
+    bill_from_country: "Randomland",
+    bill_to_email: `client${randomNumber(1, 1000)}@example.com`,
+    bill_to_name: "Random Client",
+    bill_to_street_address: "456 Client Ave",
+    bill_to_city: "Client City",
+    bill_to_postcode: "67890",
+    bill_to_country: "Clientland",
+    invoice_date: new Date(),
+    payment_terms: ["Net 30 Days", "14 Days", "7 Days"][randomNumber(0, 2)] as
+      | "Net 30 Days"
+      | "14 Days"
+      | "7 Days",
+    project_description: "Random project description",
+    items: [
+      {
+        item_description: "Random item",
+        item_quantity: randomNumber(1, 10),
+        item_price: (randomNumber(100, 1000) / 100).toFixed(2),
+        item_total: 0,
+      },
+    ],
+    status: "draft" as const,
+  };
 }

@@ -101,8 +101,9 @@ const useSelectedInvoice = () => {
           selectedInvoice.id,
           invoiceData,
         );
+        console.log("UPDATED INVOICE: ", updatedInvoice);
         setSelectedInvoice(updatedInvoice);
-        updateInvoiceInStore(updatedInvoice);
+        updateInvoice(selectedInvoice.id, updatedInvoice);
         setSuccess(true);
         setError(null);
         toast("Invoice updated successfully");

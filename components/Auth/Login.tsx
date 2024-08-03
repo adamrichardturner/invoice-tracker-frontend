@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { FaGithub } from "react-icons/fa";
+import { FaWrench } from "react-icons/fa";
 import Link from "next/link";
 
 interface LoginFormProps {
@@ -54,11 +54,11 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         </div>
 
         <p className="text-body text-sm leading-tight">
-          Enter your email and password below or sign in with GitHub.
+          Enter your email and password below or login as a demo user.
         </p>
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="space-y-2 text-heading">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -87,7 +87,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           </div>
           <Button
             type="submit"
-            className="w-full text-white bg-primary rounded-roundedBtn"
+            className="w-full mt-6 text-white bg-primary rounded-roundedBtn"
           >
             Sign In
           </Button>
@@ -99,8 +99,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           variant="outline"
           className="w-full bg-foreground dark:hover:text-black rounded-roundedBtn"
         >
-          <FaGithub className="h-5 w-5 mr-2" />
-          Sign in with GitHub
+          <FaWrench className="h-5 w-5 mr-2" />
+          Login as Demo User
         </Button>
         <Link
           href="#"

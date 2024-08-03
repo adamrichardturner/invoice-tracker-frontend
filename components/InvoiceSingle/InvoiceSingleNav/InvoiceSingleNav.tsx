@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/stores/UIState/useUIStore";
 import useSelectedInvoice from "@/hooks/invoices/useSelectedInvoice";
 import { useRouter } from "next/navigation";
+import { DeleteDialog } from "@/components/DeleteDialog/DeleteDialog";
 
 interface InvoiceSingleNavProps {
   invoice: Invoice;
@@ -41,7 +42,7 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
 
   return (
     <>
-      <div className="bg-white dark:bg-[#1E2139] w-full flex justify-between h-[88px] px-6">
+      <div className="bg-white dark:bg-[#1E2139] w-full flex justify-between h-[88px] px-6 rounded-lg shadow-md">
         <div className="flex justify-between w-full md:w-auto items-center space-x-4">
           <span className="text-[#858BB2] dark:[#DFE3FA] text-[13px]">
             Status
@@ -69,12 +70,7 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
           >
             Edit
           </Button>
-          <Button
-            onClick={handleDeleteInvoice}
-            className="bg-[#EC5757] hover:bg-[#FF9797] cursor-pointer transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
-          >
-            Delete
-          </Button>
+          <DeleteDialog onDelete={handleDeleteInvoice} invoiceId={invoice.id} />
           <Button
             onClick={() =>
               invoice.status === "paid"
@@ -92,9 +88,7 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
           <Button className="bg-[#F9FAFE] hover:bg-[#DFE3FA] dark:bg-[#252945] dark:hover:bg-[#FFFFFF] dark:hover:text-[#7E88C3] cursor-pointer transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm h-[48px] flex items-center">
             Edit
           </Button>
-          <Button className="bg-[#EC5757] hover:bg-[#FF9797] cursor-pointer transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
-            Delete
-          </Button>
+          <DeleteDialog onDelete={handleDeleteInvoice} invoiceId={invoice.id} />
           <Button className="bg-primary flex-1 w-full dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
             Mark as Paid
           </Button>

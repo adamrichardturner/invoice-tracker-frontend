@@ -4,7 +4,9 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get("connect.sid");
 
-  if (!sessionCookie) {
+  const publicPaths = ["/auth/login", "/auth/register", "/auth/confirm-email"];
+
+  if (!sessionCookie && !publicPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
@@ -12,5 +14,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/((?!_next/static|favicon.ico).*)"],
 };

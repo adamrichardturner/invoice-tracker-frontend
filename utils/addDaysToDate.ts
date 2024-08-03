@@ -3,7 +3,7 @@ import { PaymentTerms } from "@/types/Invoice";
 export function addDaysToDateFromTerm(
   date: Date | string,
   term: PaymentTerms,
-): string {
+): { invoiceDate: string; invoiceDue: string } {
   let validDate: Date;
 
   if (typeof date === "string") {
@@ -16,14 +16,25 @@ export function addDaysToDateFromTerm(
     throw new Error("Invalid date");
   }
 
-  const newDate = new Date(validDate);
-  newDate.setDate(validDate.getDate() + computeTerms(term));
-
-  return newDate.toLocaleDateString("en-GB", {
+  const invoiceDate = validDate.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
+
+  const newDate = new Date(validDate);
+  newDate.setDate(validDate.getDate() + computeTerms(term));
+
+  const invoiceDue = newDate.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  return {
+    invoiceDate,
+    invoiceDue,
+  };
 }
 
 function computeTerms(term: PaymentTerms): number {

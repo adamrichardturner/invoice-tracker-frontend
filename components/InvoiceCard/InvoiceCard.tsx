@@ -16,7 +16,7 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
     return <SkeletonInvoiceCard />;
   }
 
-  const invoiceDue = addDaysToDateFromTerm(
+  const { invoiceDue } = addDaysToDateFromTerm(
     invoice.invoice_date,
     invoice.payment_terms,
   );

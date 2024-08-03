@@ -56,3 +56,45 @@ export const getSession = async () => {
     throw new Error("An unknown error occurred while getting session");
   }
 };
+
+export const registerUser = async (
+  username: string,
+  email: string,
+  password: string,
+) => {
+  try {
+    const response = await api.post("/auth/register", {
+      username,
+      email,
+      password,
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      throw new Error(error.message);
+    } else if (error instanceof Error) {
+      throw new Error(
+        error.message || "An unknown error occurred during registration",
+      );
+    }
+    throw new Error("An unknown error occurred during registration");
+  }
+};
+
+export const confirmEmail = async (token: string) => {
+  try {
+    const response = await api.get("/auth/confirm-email", {
+      params: { token },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      throw new Error(error.message);
+    } else if (error instanceof Error) {
+      throw new Error(
+        error.message || "An unknown error occurred during email confirmation",
+      );
+    }
+    throw new Error("An unknown error occurred during email confirmation");
+  }
+};

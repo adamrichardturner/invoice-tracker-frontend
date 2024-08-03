@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { InvoiceFormSchemaType } from "@/components/InvoiceForm"
-import axios, { isAxiosError } from "axios"
+import { InvoiceFormSchemaType } from "@/components/InvoiceForm";
+import axios, { isAxiosError } from "axios";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
-})
+});
 
 export const getInvoices = async () => {
   try {
-    const response = await api.get("/api/invoices")
-    return response.data
+    const response = await api.get("/api/invoices");
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.message)
+      throw new Error(error.message);
     } else if (error instanceof Error) {
       throw new Error(
-        error.message || "An unknown error occurred during logout"
-      )
+        error.message || "An unknown error occurred during logout",
+      );
     }
-    throw new Error("An unknown error occurred during logout")
+    throw new Error("An unknown error occurred during logout");
   }
-}
+};
 
 export const getInvoiceById = async (id: string) => {
   try {
-    const response = await api.get(`/api/invoices/${id}`)
-    return response.data
+    const response = await api.get(`/api/invoices/${id}`);
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.message)
+      throw new Error(error.message);
     } else if (error instanceof Error) {
       throw new Error(
-        error.message || "An unknown error occurred while fetching the invoice"
-      )
+        error.message || "An unknown error occurred while fetching the invoice",
+      );
     }
-    throw new Error("An unknown error occurred while fetching the invoice")
+    throw new Error("An unknown error occurred while fetching the invoice");
   }
-}
+};
 
 export const createInvoice = async (invoiceData: InvoiceFormSchemaType) => {
   try {
@@ -63,25 +63,25 @@ export const createInvoice = async (invoiceData: InvoiceFormSchemaType) => {
         item_total: item.item_quantity * parseFloat(item.item_price),
       })),
       status: invoiceData.status,
-    }
+    };
 
-    const response = await api.post("/api/invoices", mappedData)
-    return response.data
+    const response = await api.post("/api/invoices", mappedData);
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.response?.data || error.message)
+      throw new Error(error.response?.data || error.message);
     } else if (error instanceof Error) {
       throw new Error(
-        error.message || "An unknown error occurred while creating the invoice"
-      )
+        error.message || "An unknown error occurred while creating the invoice",
+      );
     }
-    throw new Error("An unknown error occurred while creating the invoice")
+    throw new Error("An unknown error occurred while creating the invoice");
   }
-}
+};
 
 export const updateInvoice = async (
   id: string,
-  invoiceData: InvoiceFormSchemaType
+  invoiceData: InvoiceFormSchemaType,
 ) => {
   try {
     const mappedData = {
@@ -105,54 +105,54 @@ export const updateInvoice = async (
         item_total: item.item_quantity * parseFloat(item.item_price),
       })),
       status: invoiceData.status,
-    }
+    };
 
-    const response = await api.put(`/api/invoices/${id}`, mappedData)
-    return response.data
+    const response = await api.put(`/api/invoices/${id}`, mappedData);
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.response?.data || error.message)
+      throw new Error(error.response?.data || error.message);
     } else if (error instanceof Error) {
       throw new Error(
-        error.message || "An unknown error occurred while updating the invoice"
-      )
+        error.message || "An unknown error occurred while updating the invoice",
+      );
     }
-    throw new Error("An unknown error occurred while updating the invoice")
+    throw new Error("An unknown error occurred while updating the invoice");
   }
-}
+};
 
 export const updateInvoiceStatus = async (id: string, status: string) => {
   try {
     const response = await api.put(`/api/invoices/${id}/status`, {
       status,
-    })
-    return response.data
+    });
+    return response.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.response?.data || error.message)
+      throw new Error(error.response?.data || error.message);
     } else if (error instanceof Error) {
       throw new Error(
         error.message ||
-          "An unknown error occurred while updating the invoice status"
-      )
+          "An unknown error occurred while updating the invoice status",
+      );
     }
     throw new Error(
-      "An unknown error occurred while updating the invoice status"
-    )
+      "An unknown error occurred while updating the invoice status",
+    );
   }
-}
+};
 
 export const deleteInvoice = async (id: string) => {
   try {
-    await api.delete(`/api/invoices/${id}`)
+    await api.delete(`/api/invoices/${id}`);
   } catch (error) {
     if (isAxiosError(error)) {
-      throw new Error(error.response?.data || error.message)
+      throw new Error(error.response?.data || error.message);
     } else if (error instanceof Error) {
       throw new Error(
-        error.message || "An unknown error occurred while deleting the invoice"
-      )
+        error.message || "An unknown error occurred while deleting the invoice",
+      );
     }
-    throw new Error("An unknown error occurred while deleting the invoice")
+    throw new Error("An unknown error occurred while deleting the invoice");
   }
-}
+};

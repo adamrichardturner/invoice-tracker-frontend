@@ -1,14 +1,15 @@
-import { Invoice } from "@/types/Invoice";
+import { Invoice, InvoiceStatus } from "@/types/Invoice";
 import { StateCreator } from "zustand";
 
 export interface IInvoicesSlice {
     invoices: Invoice[];
     selectedInvoice?: Invoice;
-    selectedInvoiceId?: string;
     addInvoices: (invoices: Invoice[]) => void;
     addSingleInvoice: (invoice: Invoice) => void;
-    setSelectedInvoiceId: (id: string) => void;
-    setSelectedInvoice: (invoice: Invoice) => void;
+    setSelectedInvoice: (invoice: Invoice | undefined) => void;
+    updateInvoice: (updatedInvoice: Invoice) => void;
+    updateInvoiceStatus: (id: string, status: InvoiceStatus) => void;
+    deleteInvoice: (id: string) => void;
 }
 
 export const createInvoicesSlice: StateCreator<IInvoicesSlice> = (set) => ({
@@ -21,12 +22,36 @@ export const createInvoicesSlice: StateCreator<IInvoicesSlice> = (set) => ({
         set((state) => ({
             invoices: [...state.invoices, invoice],
         })),
-    setSelectedInvoiceId: (id: string) =>
-        set(() => ({
-            selectedInvoiceId: id,
-        })),
-    setSelectedInvoice: (invoice: Invoice) =>
+    setSelectedInvoice: (invoice: Invoice | undefined) =>
         set(() => ({
             selectedInvoice: invoice,
+        })),
+    updateInvoice: (updatedInvoice: Invoice) =>
+        set((state) => ({
+            invoices: state.invoices.map((invoice) =>
+                invoice.id === updatedInvoice.id ? updatedInvoice : invoice,
+            ),
+            selectedInvoice:
+                state.selectedInvoice?.id === updatedInvoice.id
+                    ? updatedInvoice
+                    : state.selectedInvoice,
+        })),
+    updateInvoiceStatus: (id: string, status: InvoiceStatus) =>
+        set((state) => ({
+            invoices: state.invoices.map((invoice) =>
+                invoice.id === id ? { ...invoice, status } : invoice,
+            ),
+            selectedInvoice:
+                state.selectedInvoice?.id === id
+                    ? { ...state.selectedInvoice, status }
+                    : state.selectedInvoice,
+        })),
+    deleteInvoice: (id: string) =>
+        set((state) => ({
+            invoices: state.invoices.filter((invoice) => invoice.id !== id),
+            selectedInvoice:
+                state.selectedInvoice?.id === id
+                    ? undefined
+                    : state.selectedInvoice,
         })),
 });

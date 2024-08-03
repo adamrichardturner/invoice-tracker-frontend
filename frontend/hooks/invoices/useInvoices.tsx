@@ -1,24 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
-import {
-    getInvoices,
-    createInvoice,
-    getInvoiceById,
-} from "@/services/invoiceService";
-import { toast } from "sonner";
-import { InvoiceFormSchemaType } from "@/components/InvoiceForm";
+import { getInvoices, getInvoiceById } from "@/services/invoiceService";
 import { useInvoicesStore } from "@/stores/InvoicesState/useInvoicesStore";
 
 const useInvoices = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [invoicesLoaded, setInvoicesLoaded] = useState(true);
-    const {
-        invoices,
-        addInvoices,
-        addSingleInvoice,
-        selectedInvoiceId,
-        setSelectedInvoiceId,
-    } = useInvoicesStore();
+    const { invoices, addInvoices } = useInvoicesStore();
 
     const getSingleInvoice = useCallback(async (id: string) => {
         setLoading(true);
@@ -57,29 +45,6 @@ const useInvoices = () => {
         }
     }, [addInvoices]);
 
-    const addInvoice = useCallback(
-        async (invoiceData: InvoiceFormSchemaType) => {
-            setLoading(true);
-            setError(null);
-            try {
-                const newInvoice = await createInvoice(invoiceData);
-                addSingleInvoice(newInvoice);
-                toast("Invoice created");
-            } catch (error) {
-                if (error instanceof Error) {
-                    setError(
-                        error.message ||
-                            "An unknown error occurred while creating an invoice",
-                    );
-                    toast("Error creating invoice");
-                }
-            } finally {
-                setLoading(false);
-            }
-        },
-        [addSingleInvoice],
-    );
-
     useEffect(() => {
         fetchInvoices();
     }, []);
@@ -89,11 +54,8 @@ const useInvoices = () => {
         loading,
         error,
         fetchInvoices,
-        addInvoice,
         getSingleInvoice,
         invoicesLoaded,
-        selectedInvoiceId,
-        setSelectedInvoiceId,
     };
 };
 

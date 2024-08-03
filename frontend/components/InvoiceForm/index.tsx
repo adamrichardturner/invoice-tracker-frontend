@@ -16,9 +16,10 @@ import { DatePicker } from "@/components/DatePicker";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { FaTrash } from "react-icons/fa";
 import { PaymentTermsDropdown } from "./PaymentTermsDropdown";
-import useInvoices from "@/hooks/invoices/useInvoices";
 import { toast } from "sonner";
 import { useInvoicesStore } from "@/stores/InvoicesState/useInvoicesStore";
+import { useUIStore } from "@/stores/UIState/useUIStore";
+import useSelectedInvoice from "@/hooks/invoices/useSelectedInvoice";
 
 const InvoiceFormSchema = z.object({
     bill_from_street_address: z.string().min(1, "Street address is required"),
@@ -82,44 +83,46 @@ const updateItemTotal = (
 
 export function InvoiceForm() {
     const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
-    const { addInvoice } = useInvoices();
     const selectedInvoice = useInvoicesStore((state) => state.selectedInvoice);
+    const selectedEditorMode = useUIStore((state) => state.selectedEditorMode);
+    const { updateSelectedInvoice, addInvoice } = useSelectedInvoice();
 
     const form = useForm<InvoiceFormSchemaType>({
         mode: "onSubmit",
         resolver: zodResolver(InvoiceFormSchema),
-        defaultValues: selectedInvoice
-            ? {
-                  ...selectedInvoice,
-                  items: selectedInvoice.items.map((item) => ({
-                      ...item,
-                      item_total: parseFloat(item.item_total.toString()),
-                  })),
-              }
-            : {
-                  bill_from_street_address: "",
-                  bill_from_city: "",
-                  bill_from_postcode: "",
-                  bill_from_country: "",
-                  bill_to_email: "",
-                  bill_to_name: "",
-                  bill_to_street_address: "",
-                  bill_to_city: "",
-                  bill_to_postcode: "",
-                  bill_to_country: "",
-                  invoice_date: new Date(),
-                  payment_terms: "Net 30 Days",
-                  project_description: "",
-                  items: [
-                      {
-                          item_description: "",
-                          item_quantity: 1,
-                          item_price: "0",
-                          item_total: 0,
-                      },
-                  ],
-                  status: "draft",
-              },
+        defaultValues:
+            selectedEditorMode === "edit" && selectedInvoice
+                ? {
+                      ...selectedInvoice,
+                      items: selectedInvoice.items?.map((item) => ({
+                          ...item,
+                          item_total: parseFloat(item.item_total.toString()),
+                      })),
+                  }
+                : {
+                      bill_from_street_address: "",
+                      bill_from_city: "",
+                      bill_from_postcode: "",
+                      bill_from_country: "",
+                      bill_to_email: "",
+                      bill_to_name: "",
+                      bill_to_street_address: "",
+                      bill_to_city: "",
+                      bill_to_postcode: "",
+                      bill_to_country: "",
+                      invoice_date: new Date(),
+                      payment_terms: "Net 30 Days",
+                      project_description: "",
+                      items: [
+                          {
+                              item_description: "",
+                              item_quantity: 1,
+                              item_price: "0",
+                              item_total: 0,
+                          },
+                      ],
+                      status: "draft",
+                  },
     });
 
     const { fields, append, remove } = useFieldArray({
@@ -144,8 +147,13 @@ export function InvoiceForm() {
     const onSubmit = async (data: InvoiceFormSchemaType) => {
         try {
             await addInvoice(data);
-
             setIsSubmitSuccessful(true);
+            setTimeout(() => {
+                const closeButton = document.querySelector(
+                    ".sheet-close-button",
+                ) as HTMLElement;
+                if (closeButton) closeButton.click();
+            }, 300);
         } catch (error) {
             setTimeout(() => {
                 toast("Failed to create invoice");
@@ -154,9 +162,31 @@ export function InvoiceForm() {
         }
     };
 
-    const handleSubmit = (status: "draft" | "pending") => {
+    const handleSubmit = async (
+        status: "draft" | "pending",
+        editorMode: "edit" | "create",
+    ) => {
         form.setValue("status", status);
-        form.handleSubmit(onSubmit)();
+
+        if (editorMode === "create") {
+            form.handleSubmit(onSubmit)();
+        } else if (editorMode === "edit") {
+            try {
+                await updateSelectedInvoice(form.getValues());
+                setIsSubmitSuccessful(true);
+                setTimeout(() => {
+                    const closeButton = document.querySelector(
+                        ".sheet-close-button",
+                    ) as HTMLElement;
+                    if (closeButton) closeButton.click();
+                }, 300);
+            } catch (error) {
+                setTimeout(() => {
+                    toast("Failed to update invoice");
+                }, 1000);
+                setIsSubmitSuccessful(false);
+            }
+        }
     };
 
     const handlePriceInput = (
@@ -215,13 +245,15 @@ export function InvoiceForm() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8 mb-8 sm:mb-0"
             >
-                <Button
-                    type="button"
-                    onClick={handlePopulateRandomData}
-                    className="bg-[#F9FAFE] dark:bg-[#252945] min-h-[48px] w-full rounded-3xl text-body hover:text-white"
-                >
-                    Populate with Random Data
-                </Button>
+                {selectedEditorMode === "create" && (
+                    <Button
+                        type="button"
+                        onClick={handlePopulateRandomData}
+                        className="bg-primary min-h-[48px] w-full rounded-3xl text-white hover:text-white"
+                    >
+                        Populate with Random Data
+                    </Button>
+                )}
                 <div className="space-y-2">
                     <div className="flex flex-col justify-start items-start space-y-3">
                         <h3 className="text-primary font-semibold text-sm tracking-[-0.25px]">
@@ -587,49 +619,110 @@ export function InvoiceForm() {
                     )}
                 </div>
 
-                <div className="flex justify-between">
-                    <SheetClose>
-                        <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
-                            Discard
-                        </div>
-                    </SheetClose>
+                {selectedEditorMode === "create" && (
+                    <div className="flex justify-between">
+                        <SheetClose>
+                            <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
+                                Discard
+                            </div>
+                        </SheetClose>
 
-                    <div className="flex space-x-3">
+                        <div className="flex space-x-3">
+                            <div className="flex items-end justify-end">
+                                {isSubmitSuccessful ? (
+                                    <SheetClose asChild>
+                                        <Button
+                                            onClick={() =>
+                                                handleSubmit("draft", "create")
+                                            }
+                                            disabled={!form.formState.isDirty}
+                                            className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+                                        >
+                                            Save as Draft
+                                        </Button>
+                                    </SheetClose>
+                                ) : (
+                                    <Button
+                                        onClick={() =>
+                                            handleSubmit("draft", "create")
+                                        }
+                                        disabled={!form.formState.isDirty}
+                                        className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+                                    >
+                                        Save as Draft
+                                    </Button>
+                                )}
+                            </div>
+
+                            <div className="flex items-end justify-end">
+                                {isSubmitSuccessful ? (
+                                    <SheetClose asChild>
+                                        <Button
+                                            onClick={() =>
+                                                handleSubmit(
+                                                    "pending",
+                                                    "create",
+                                                )
+                                            }
+                                            disabled={!form.formState.isDirty}
+                                            type="button"
+                                            className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
+                                        >
+                                            Save & Send
+                                        </Button>
+                                    </SheetClose>
+                                ) : (
+                                    <Button
+                                        onClick={() =>
+                                            handleSubmit("pending", "create")
+                                        }
+                                        disabled={!form.formState.isDirty}
+                                        type="button"
+                                        className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
+                                    >
+                                        Save & Send
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {selectedEditorMode === "edit" && (
+                    <div className="flex justify-end space-x-3">
+                        <SheetClose asChild>
+                            <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center sheet-close-button">
+                                Cancel
+                            </div>
+                        </SheetClose>
                         <div className="flex items-end justify-end">
                             {isSubmitSuccessful ? (
                                 <SheetClose asChild>
-                                    <div
-                                        onClick={() => handleSubmit("draft")}
-                                        className="bg-[#373B53] dark:bg-[#373B53] pt-[3px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+                                    <Button
+                                        onClick={() =>
+                                            handleSubmit("pending", "edit")
+                                        }
+                                        disabled={!form.formState.isDirty}
+                                        type="button"
+                                        className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center"
                                     >
-                                        Save as Draft
-                                    </div>
+                                        Save Changes
+                                    </Button>
                                 </SheetClose>
                             ) : (
-                                <SheetClose asChild>
-                                    <div
-                                        onClick={() => handleSubmit("draft")}
-                                        className="bg-[#373B53] dark:bg-[#373B53] pt-[3px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
-                                    >
-                                        Save as Draft
-                                    </div>
-                                </SheetClose>
-                            )}
-                        </div>
-
-                        <div className="flex items-end justify-end">
-                            <SheetClose asChild>
                                 <Button
-                                    onClick={() => handleSubmit("pending")}
+                                    onClick={() =>
+                                        handleSubmit("pending", "edit")
+                                    }
                                     type="button"
+                                    disabled={!form.formState.isDirty}
                                     className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center"
                                 >
-                                    Save & Send
+                                    Save Changes
                                 </Button>
-                            </SheetClose>
+                            )}
                         </div>
                     </div>
-                </div>
+                )}
             </form>
         </Form>
     );

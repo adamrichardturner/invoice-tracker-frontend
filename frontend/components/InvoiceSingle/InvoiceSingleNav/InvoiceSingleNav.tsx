@@ -1,20 +1,21 @@
 "use client";
 
 import { computeStatusStyles } from "@/components/InvoiceCard/InvoiceCard";
-import { Invoice } from "@/types/Invoice";
+import { Invoice, InvoiceStatus } from "@/types/Invoice";
 import { capitalizeFirstLetter } from "../../InvoiceCard/InvoiceCard";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/stores/UIState/useUIStore";
-import { useInvoicesStore } from "@/stores/InvoicesState/useInvoicesStore";
+import useSelectedInvoice from "@/hooks/invoices/useSelectedInvoice";
+import { useRouter } from "next/navigation";
 
 interface InvoiceSingleNavProps {
     invoice: Invoice;
 }
 
 export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
-    const { setSelectedInvoice } = useInvoicesStore((state) => ({
-        setSelectedInvoice: state.setSelectedInvoice,
-    }));
+    const router = useRouter();
+    const { deleteSelectedInvoice, updateSelectedInvoiceStatus } =
+        useSelectedInvoice();
 
     const { setSheetOpen, setSelectedEditorMode } = useUIStore((state) => ({
         setSheetOpen: state.setSheetOpen,
@@ -22,9 +23,18 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
     }));
 
     const handleToggleSheet = () => {
-        setSelectedInvoice(invoice);
         setSelectedEditorMode("edit");
         setSheetOpen(true);
+    };
+
+    const handleDeleteInvoice = () => {
+        router.push("/");
+        deleteSelectedInvoice();
+        setSelectedEditorMode("create");
+    };
+
+    const updateInvoiceStatus = (status: InvoiceStatus) => {
+        updateSelectedInvoiceStatus(status);
     };
 
     const statusIntent = computeStatusStyles(invoice.status);
@@ -59,11 +69,23 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
                     >
                         Edit
                     </Button>
-                    <Button className="bg-[#EC5757] hover:bg-[#FF9797] cursor-pointer transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
+                    <Button
+                        onClick={handleDeleteInvoice}
+                        className="bg-[#EC5757] hover:bg-[#FF9797] cursor-pointer transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+                    >
                         Delete
                     </Button>
-                    <Button className="bg-primary dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
-                        Mark as Paid
+                    <Button
+                        onClick={() =>
+                            invoice.status === "paid"
+                                ? updateInvoiceStatus("pending")
+                                : updateInvoiceStatus("paid")
+                        }
+                        className="bg-primary dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+                    >
+                        {invoice.status === "paid"
+                            ? "Mark as Pending"
+                            : "Mark as Paid"}
                     </Button>
                 </div>
             </div>

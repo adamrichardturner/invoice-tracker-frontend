@@ -63,7 +63,6 @@ const InvoiceFormSchema = z.object({
 export type InvoiceFormSchemaType = z.infer<typeof InvoiceFormSchema>;
 
 export function InvoiceForm() {
-  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"draft" | "pending">(
     "draft",
@@ -80,6 +79,7 @@ export function InvoiceForm() {
       selectedEditorMode === "edit" && selectedInvoice
         ? {
             ...selectedInvoice,
+            invoice_date: new Date(selectedInvoice.invoice_date),
             items: selectedInvoice.items?.map((item) => ({
               ...item,
               item_total: parseFloat(item.item_total.toString()),
@@ -132,19 +132,16 @@ export function InvoiceForm() {
 
   const handleSubmit = async (data: InvoiceFormSchemaType) => {
     setIsSubmitting(true);
-    data.status = submitStatus;
-
     try {
       if (selectedEditorMode === "create") {
+        data.status = submitStatus;
         await addInvoice(data);
       } else if (selectedEditorMode === "edit") {
         await updateSelectedInvoice(data);
       }
-      setIsSubmitSuccessful(true);
       setSheetOpen(false);
     } catch (error) {
       toast("Failed to submit invoice");
-      setIsSubmitSuccessful(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -178,7 +175,7 @@ export function InvoiceForm() {
           <Button
             type="button"
             onClick={handlePopulateRandomData}
-            className="bg-primary min-h-[48px] w-full rounded-3xl text-white hover:text-white"
+            className="bg-primary min-h-[48px] pt-[10px] w-full rounded-3xl text-white hover:text-white"
           >
             Populate with Random Data
           </Button>
@@ -497,43 +494,69 @@ export function InvoiceForm() {
           )}
         </div>
 
-        <div className="flex justify-between">
-          <SheetClose>
-            <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
-              Discard
-            </div>
-          </SheetClose>
+        {selectedEditorMode === "create" && (
+          <div className="flex justify-between">
+            <SheetClose>
+              <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
+                Discard
+              </div>
+            </SheetClose>
 
-          <div className="flex space-x-3">
-            <div className="flex items-end justify-end">
-              <Button
-                type="button"
-                onClick={() => {
-                  setSubmitStatus("draft");
-                  form.handleSubmit(handleSubmit)();
-                }}
-                disabled={isSubmitting}
-                className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
-              >
-                Save as Draft
-              </Button>
-            </div>
+            <div className="flex space-x-3">
+              <div className="flex items-end justify-end">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setSubmitStatus("draft");
+                    form.handleSubmit(handleSubmit)();
+                  }}
+                  disabled={isSubmitting}
+                  className="bg-[#373B53] dark:bg-[#373B53] pt-[10px] dark:text-white transition-colors cursor-pointer hover:bg-[#1E2139] hover:text-white px-4 rounded-3xl text-[#888EB0] font-semibold text-sm min-h-[48px] flex items-center"
+                >
+                  Save as Draft
+                </Button>
+              </div>
 
-            <div className="flex items-end justify-end">
-              <Button
-                type="button"
-                onClick={() => {
-                  setSubmitStatus("pending");
-                  form.handleSubmit(handleSubmit)();
-                }}
-                disabled={isSubmitting}
-                className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
-              >
-                Save & Send
-              </Button>
+              <div className="flex items-end justify-end">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setSubmitStatus("pending");
+                    form.handleSubmit(handleSubmit)();
+                  }}
+                  disabled={isSubmitting}
+                  className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
+                >
+                  Save & Send
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+        {selectedEditorMode === "edit" && (
+          <div className="flex justify-end space-x-3">
+            <SheetClose>
+              <div className="bg-[#F9FAFE] dark:bg-[#252945] cursor-pointer pt-[3px] transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm min-h-[48px] flex items-center">
+                Cancel
+              </div>
+            </SheetClose>
+
+            <div className="flex space-x-3 justify-end">
+              <div className="flex items-end justify-end">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    form.handleSubmit(handleSubmit)();
+                  }}
+                  disabled={isSubmitting || !form.formState.isDirty}
+                  className="bg-primary-foreground pt-[10px] transition-colors px-4 rounded-3xl text-white font-semibold text-sm min-h-[48px] flex items-center sheet-close-button"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
     </Form>
   );

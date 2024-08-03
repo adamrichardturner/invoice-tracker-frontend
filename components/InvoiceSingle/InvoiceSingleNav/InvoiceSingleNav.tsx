@@ -85,12 +85,22 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
       </div>
       <div className="bg-white fixed md:hidden bottom-0 dark:bg-[#1E2139] w-full flex justify-between h-[88px] px-6">
         <div className="flex md:hidden items-center space-x-2 w-full">
-          <Button className="bg-[#F9FAFE] hover:bg-[#DFE3FA] dark:bg-[#252945] dark:hover:bg-[#FFFFFF] dark:hover:text-[#7E88C3] cursor-pointer transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm h-[48px] flex items-center">
+          <Button
+            onClick={handleToggleSheet}
+            className="bg-[#F9FAFE] hover:bg-[#DFE3FA] dark:bg-[#252945] dark:hover:bg-[#FFFFFF] dark:hover:text-[#7E88C3] cursor-pointer transition-colors px-4 rounded-3xl text-[#7E88C3] dark:text-[#DFE3FA] font-semibold text-sm h-[48px] flex items-center"
+          >
             Edit
           </Button>
           <DeleteDialog onDelete={handleDeleteInvoice} invoiceId={invoice.id} />
-          <Button className="bg-primary flex-1 w-full dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
-            Mark as Paid
+          <Button
+            onClick={() =>
+              invoice.status === "paid"
+                ? updateInvoiceStatus("pending")
+                : updateInvoiceStatus("paid")
+            }
+            className="bg-primary flex-1 w-full dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+          >
+            {invoice.status === "paid" ? "Mark as Pending" : "Mark as Paid"}
           </Button>
         </div>
       </div>

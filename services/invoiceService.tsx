@@ -97,7 +97,7 @@ export const updateInvoice = async (
             bill_to_city: invoiceData.bill_to_city,
             bill_to_postcode: invoiceData.bill_to_postcode,
             bill_to_country: invoiceData.bill_to_country,
-            invoice_date: new Date(invoiceData.invoice_date).toISOString(), // Convert to Date object
+            invoice_date: new Date(invoiceData.invoice_date).toISOString(),
             payment_terms: invoiceData.payment_terms,
             project_description: invoiceData.project_description,
             items: invoiceData.items.map((item) => ({

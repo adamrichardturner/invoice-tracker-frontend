@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import axios from "axios";
 
 export default function ConfirmEmail() {
@@ -37,7 +38,9 @@ export default function ConfirmEmail() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-2xl font-bold">{message}</h1>
+      <Suspense>
+        <h1 className="text-2xl font-bold">{message}</h1>
+      </Suspense>
     </div>
   );
 }

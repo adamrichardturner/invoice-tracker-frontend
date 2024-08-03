@@ -14,7 +14,7 @@ export default function ConfirmEmailPage() {
   );
 }
 
-export function ConfirmEmailContent() {
+function ConfirmEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");

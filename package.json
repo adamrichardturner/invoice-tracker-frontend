@@ -1,9 +1,9 @@
 {
-  "name": "frontend",
+  "name": "invoice-tracker-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p",
     "build": "next build",
     "start": "next start -p 5000",
     "lint": "eslint . --ext .ts,.tsx",

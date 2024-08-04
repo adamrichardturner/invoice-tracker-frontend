@@ -1,6 +1,6 @@
 # Invoice Tracker - Frontend
 
-This is the frontend for an Invoice Tracker application, built with Next.js in TypeScript, Tailwind CSS, and Shadcn.
+This is the frontend for an Invoice Tracker application, written in TypeScript and built with Next.js, Tailwind CSS, and Shadcn.
 
 It interacts with the backend server to manage invoices efficiently.
 
@@ -66,7 +66,7 @@ You will need the backend API to effectively run this application, available [he
 
 5. **Create a demo account in the database**
 
-   For the `Login as Demo User` button on the login form you will need a user account in the database with email/password as `demo@demo.com` and `password123`.
+   For the `Login as Demo User` button on the login form you will need a user account in the database with email/password as `demo@demo.com` and `demo123`.
 
 ## Usage
 

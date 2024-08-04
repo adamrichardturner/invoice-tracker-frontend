@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { getInvoices, getInvoiceById } from "@/services/invoiceService";
 import { useInvoicesStore } from "@/stores/InvoicesState/useInvoicesStore";
 
@@ -43,10 +43,6 @@ const useInvoices = () => {
       setLoading(false);
     }
   }, [addInvoices]);
-
-  useEffect(() => {
-    fetchInvoices();
-  }, []);
 
   return {
     invoices,

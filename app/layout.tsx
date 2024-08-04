@@ -15,7 +15,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Invoice Tracker | Adam Richard Turner",
     description: "Invoice Tracking app built with Next & Express",
-    images: "https://invoice-tracker.adamrichardturner.dev/opengraph-image.png",
+    images: [
+      {
+        url: `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
+        secureUrl: `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
+        width: 2400,
+        height: 1200,
+        alt: `Preview image for Invoice Tracker by Adam Richard Turner`,
+      },
+    ],
   },
 };
 

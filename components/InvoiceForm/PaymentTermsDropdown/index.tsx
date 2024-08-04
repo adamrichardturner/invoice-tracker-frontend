@@ -30,7 +30,7 @@ export function PaymentTermsDropdown({
       <DropdownMenuTrigger asChild className="w-full text-heading text-left">
         <Button
           variant="ghost"
-          className="bg-foreground text-left flex items-center justify-between border border-input"
+          className="bg-foreground text-left text-[16px] font-normal pl-3 pt-[12px] flex items-center justify-between border border-input"
         >
           {field.value}
           <FaChevronDown className="text-xs" />

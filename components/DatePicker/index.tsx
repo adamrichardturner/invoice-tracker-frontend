@@ -42,7 +42,7 @@ export function DatePicker<T extends FieldValues>({
                 <Button
                   variant={"calendar"}
                   className={cn(
-                    "w-full pl-3 text-left font-normal border border-input",
+                    "w-full pl-3 text-left font-normal text-[16px] pt-[12px] border border-input",
                     !field.value && "text-heading bg-foreground",
                   )}
                 >

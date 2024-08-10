@@ -2,6 +2,7 @@
 
 import React, { forwardRef, Ref } from "react";
 import { useUIStore } from "@/stores/UIState/useUIStore";
+import { useRouter } from "next/navigation";
 
 const SheetToggle = forwardRef<HTMLDivElement, object>(
   (_, ref: Ref<HTMLDivElement>) => {
@@ -10,9 +11,10 @@ const SheetToggle = forwardRef<HTMLDivElement, object>(
       setSelectedEditorMode: state.setSelectedEditorMode,
     }));
 
+    const router = useRouter();
+
     const handleToggleSheet = () => {
-      setSelectedEditorMode("create");
-      setSheetOpen(true);
+      router.push("/");
     };
 
     return (

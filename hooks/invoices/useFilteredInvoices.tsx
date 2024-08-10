@@ -7,10 +7,16 @@ const useFilteredInvoices = () => {
   }));
 
   const selectedFilters = useUIStore((state) => state.selectedFilters);
-  const filteredInvoices =
+  const filteredByStatus =
     selectedFilters.length > 0
       ? invoices.filter((invoice) => selectedFilters.includes(invoice.status))
       : invoices;
+
+  const filteredInvoices = filteredByStatus.sort((a, b) => {
+    const dateA = new Date(a.invoice_date);
+    const dateB = new Date(b.invoice_date);
+    return dateA.getTime() - dateB.getTime();
+  });
 
   return {
     filteredInvoices,

@@ -73,17 +73,11 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
           <DeleteDialog onDelete={handleDeleteInvoice} invoiceId={invoice.id} />
           <Button
             onClick={() =>
-              invoice.status === "paid"
-                ? updateInvoiceStatus("pending")
-                : updateInvoiceStatus("paid")
+              handleStatusClick(invoice.status, updateInvoiceStatus)
             }
-            className={
-              invoice.status === "pending"
-                ? "bg-primary flex-1 w-full transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
-                : "bg-[#FFF9F0] dark:bg-[#2B2736] text-[#FF8F00] dark:text-[#FF8F00] flex-1 w-full dark:hover:bg-[#2B2736] hover:bg-[#FFF9F0] transition-colors px-4 rounded-3xl font-semibold text-sm h-[48px] flex items-center"
-            }
+            className={displayStatusStyles(invoice.status).buttonStyles}
           >
-            {invoice.status === "paid" ? "Mark as Pending" : "Mark as Paid"}
+            {displayStatusStyles(invoice.status).buttonText}
           </Button>
         </div>
       </div>
@@ -98,20 +92,65 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
           <DeleteDialog onDelete={handleDeleteInvoice} invoiceId={invoice.id} />
           <Button
             onClick={() =>
-              invoice.status === "paid"
-                ? updateInvoiceStatus("pending")
-                : updateInvoiceStatus("paid")
+              handleStatusClick(invoice.status, updateInvoiceStatus)
             }
-            className={
-              invoice.status === "pending"
-                ? "bg-primary flex-1 w-full transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
-                : "bg-[#FFF9F0] dark:bg-[#2B2736] text-[#FF8F00] dark:text-[#FF8F00] flex-1 w-full dark:hover:bg-[#2B2736] hover:bg-[#FFF9F0] transition-colors px-4 rounded-3xl font-semibold text-sm h-[48px] flex items-center"
-            }
+            className={displayStatusStyles(invoice.status).buttonStyles}
           >
-            {invoice.status === "paid" ? "Mark as Pending" : "Mark as Paid"}
+            {displayStatusStyles(invoice.status).buttonText}
           </Button>
         </div>
       </div>
     </>
   );
+}
+
+function handleStatusClick(
+  status: InvoiceStatus,
+  updateInvoiceStatus: (status: InvoiceStatus) => void,
+) {
+  switch (status) {
+    case "draft": {
+      return updateInvoiceStatus("pending");
+    }
+    case "pending": {
+      return updateInvoiceStatus("paid");
+    }
+    case "paid": {
+      return updateInvoiceStatus("pending");
+    }
+    default:
+      return;
+  }
+}
+
+function displayStatusStyles(status: InvoiceStatus) {
+  switch (status) {
+    case "draft": {
+      return {
+        buttonText: "Mark as Pending",
+        buttonStyles:
+          "bg-[#FFF9F0] dark:bg-[#2B2736] text-[#FF8F00] dark:text-[#FF8F00] flex-1 w-full dark:hover:bg-[#2B2736] hover:bg-[#FFF9F0] transition-colors px-4 rounded-3xl font-semibold text-sm h-[48px] flex items-center",
+      };
+    }
+    case "pending": {
+      return {
+        buttonText: "Mark as Paid",
+        buttonStyles:
+          "bg-primary flex-1 w-full transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center",
+      };
+    }
+    case "paid": {
+      return {
+        buttonText: "Mark as Pending",
+        buttonStyles:
+          "bg-[#FFF9F0] dark:bg-[#2B2736] text-[#FF8F00] dark:text-[#FF8F00] flex-1 w-full dark:hover:bg-[#2B2736] hover:bg-[#FFF9F0] transition-colors px-4 rounded-3xl font-semibold text-sm h-[48px] flex items-center",
+      };
+    }
+    default:
+      return {
+        buttonText: "Unknown Status",
+        buttonStyles:
+          "bg-gray-300 flex-1 w-full transition-colors px-4 rounded-3xl text-black font-semibold text-sm h-[48px] flex items-center",
+      };
+  }
 }

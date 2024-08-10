@@ -9,17 +9,21 @@ const spartan = League_Spartan({
   weight: ["400", "500", "700"],
 });
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  "https://invoice-tracker.adamrichardturner.dev";
+
 export const metadata: Metadata = {
   title: "Invoice Tracker | Adam Richard Turner",
   description: "Invoice Tracking app built with Next & Express",
   openGraph: {
     title: "Invoice Tracker | Adam Richard Turner",
     description: "Invoice Tracking app built with Next & Express",
-    url: "https://invoice-tracker.adamrichardturner.dev",
+    url: `${baseUrl}`,
     siteName: "Invoice Tracker",
     images: [
       {
-        url: `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
+        url: `${baseUrl}/opengraph-image.png`,
         width: 1200,
         height: 630,
         alt: `Preview image for Invoice Tracker by Adam Richard Turner`,
@@ -34,7 +38,7 @@ export const metadata: Metadata = {
     description: "Invoice Tracking app built with Next & Express",
     images: [
       {
-        url: `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
+        url: `${baseUrl}/opengraph-image.png`,
         alt: `Preview image for Invoice Tracker by Adam Richard Turner`,
       },
     ],

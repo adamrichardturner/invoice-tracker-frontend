@@ -38,7 +38,7 @@ const useSelectedInvoice = () => {
       try {
         const newInvoice = await createInvoice(invoiceData);
         addSingleInvoice(newInvoice);
-        toast("Invoice created");
+        toast.success("Invoice created");
         setSuccess(true);
       } catch (error) {
         if (error instanceof Error) {
@@ -73,7 +73,7 @@ const useSelectedInvoice = () => {
         updateInvoiceStatusInStore(selectedInvoice.id, status);
         setSuccess(true);
         setError(null);
-        toast("Invoice status updated successfully");
+        toast.success("Invoice status updated successfully");
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -105,7 +105,7 @@ const useSelectedInvoice = () => {
         updateInvoice(selectedInvoice.id, updatedInvoice);
         setSuccess(true);
         setError(null);
-        toast("Invoice updated successfully");
+        toast.info("Invoice updated successfully");
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -133,7 +133,7 @@ const useSelectedInvoice = () => {
       setSelectedInvoice(undefined);
       setSuccess(true);
       setError(null);
-      toast("Invoice deleted");
+      toast.error("Invoice deleted");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

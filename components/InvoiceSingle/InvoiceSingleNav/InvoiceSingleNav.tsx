@@ -77,7 +77,11 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
                 ? updateInvoiceStatus("pending")
                 : updateInvoiceStatus("paid")
             }
-            className="bg-primary dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+            className={
+              invoice.status === "pending"
+                ? "bg-primary flex-1 w-full transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+                : "bg-[#FFF9F0] dark:bg-[#2B2736] text-[#FF8F00] dark:text-[#FF8F00] flex-1 w-full dark:hover:bg-[#2B2736] hover:bg-[#FFF9F0] transition-colors px-4 rounded-3xl font-semibold text-sm h-[48px] flex items-center"
+            }
           >
             {invoice.status === "paid" ? "Mark as Pending" : "Mark as Paid"}
           </Button>
@@ -98,7 +102,11 @@ export default function InvoiceSingleNav({ invoice }: InvoiceSingleNavProps) {
                 ? updateInvoiceStatus("pending")
                 : updateInvoiceStatus("paid")
             }
-            className="bg-primary flex-1 w-full dark:hover:bg-[#9277FF] transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+            className={
+              invoice.status === "pending"
+                ? "bg-primary flex-1 w-full transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center"
+                : "bg-[#FFF9F0] dark:bg-[#2B2736] text-[#FF8F00] dark:text-[#FF8F00] flex-1 w-full dark:hover:bg-[#2B2736] hover:bg-[#FFF9F0] transition-colors px-4 rounded-3xl font-semibold text-sm h-[48px] flex items-center"
+            }
           >
             {invoice.status === "paid" ? "Mark as Pending" : "Mark as Paid"}
           </Button>

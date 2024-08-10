@@ -97,7 +97,7 @@ export const InvoiceCard = ({ invoice }: InvoiceCardProps) => {
           <div
             className={`absolute inset-0 rounded-md ${statusIntent.background}`}
           ></div>
-          <div className="relative px-2 py-1 rounded-full flex items-center">
+          <div className="relative px-2 w-[106px] justify-center py-1 rounded-full flex items-center">
             <span
               className={`inline-block w-2 h-2 rounded-full mr-2 ${statusIntent.iconColor} ${statusIntent.darkModeIconColor}`}
             ></span>

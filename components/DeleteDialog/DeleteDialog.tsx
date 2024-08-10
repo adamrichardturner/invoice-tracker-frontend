@@ -20,9 +20,9 @@ export const DeleteDialog = ({ onDelete, invoiceId }: DeleteDialogProps) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger>
-        <Button className="bg-[#EC5757] hover:bg-[#FF9797] cursor-pointer transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
+        <div className="bg-[#EC5757] hover:bg-[#FF9797] cursor-pointer transition-colors px-4 rounded-3xl text-white font-semibold text-sm h-[48px] flex items-center">
           Delete
-        </Button>
+        </div>
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-white dark:bg-[#1E2139] p-10">
         <AlertDialogHeader>

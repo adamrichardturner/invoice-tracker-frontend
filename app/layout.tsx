@@ -21,12 +21,12 @@ export const metadata: Metadata = {
     images: [
       {
         url: `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
-        width: 2400,
-        height: 1200,
+        width: 1200,
+        height: 630,
         alt: `Preview image for Invoice Tracker by Adam Richard Turner`,
       },
     ],
-    locale: "en_US",
+    locale: "en_GB",
     type: "website",
   },
   twitter: {
@@ -34,7 +34,10 @@ export const metadata: Metadata = {
     title: "Invoice Tracker | Adam Richard Turner",
     description: "Invoice Tracking app built with Next & Express",
     images: [
-      `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
+      {
+        url: `https://invoice-tracker.adamrichardturner.dev/opengraph-image.png`,
+        alt: `Preview image for Invoice Tracker by Adam Richard Turner`,
+      },
     ],
     creator: "@devadam88",
   },

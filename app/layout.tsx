@@ -10,7 +10,6 @@ const spartan = League_Spartan({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://invoice-tracker.adamrichardturner.dev"),
   title: "Invoice Tracker | Adam Richard Turner",
   description: "Invoice Tracking app built with Next & Express",
   openGraph: {

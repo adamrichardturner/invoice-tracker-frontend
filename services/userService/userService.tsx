@@ -5,6 +5,15 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Add interceptor to include token in requests if it exists
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const isAxiosError = (error: unknown): error is AxiosError => {
   return (error as AxiosError).isAxiosError !== undefined;
 };
@@ -25,20 +34,19 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-export const loginWithDemoUser = async () => {
+export const loginWithDemo = async () => {
   try {
-    const response = await api.post("/user/demo-login", {
-      method: "POST",
-      credentials: "include",
-    });
+    const response = await api.post("/user/demo-login");
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      document.cookie = `token=${response.data.token}; path=/`;
+      api.defaults.headers.common["Authorization"] =
+        `Bearer ${response.data.token}`;
+    }
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       throw new Error(error.message);
-    } else if (error instanceof Error) {
-      throw new Error(
-        error.message || "An unknown error occurred during demo login",
-      );
     }
     throw new Error("An unknown error occurred during demo login");
   }
@@ -46,15 +54,12 @@ export const loginWithDemoUser = async () => {
 
 export const logout = async () => {
   try {
-    const response = await api.post("/user/logout");
-    return response.data;
+    localStorage.removeItem("token");
+    delete api.defaults.headers.common["Authorization"];
+    return { success: true };
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       throw new Error(error.message);
-    } else if (error instanceof Error) {
-      throw new Error(
-        error.message || "An unknown error occurred during logout",
-      );
     }
     throw new Error("An unknown error occurred during logout");
   }

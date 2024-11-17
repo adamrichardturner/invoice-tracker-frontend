@@ -5,19 +5,39 @@ import useInvoices from "@/hooks/invoices/useInvoices";
 import useFilteredInvoices from "../hooks/invoices/useFilteredInvoices";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
 export default function InvoicesPage() {
   const router = useRouter();
   const { loading, invoicesLoaded, fetchInvoices } = useInvoices();
   const { filteredInvoices } = useFilteredInvoices();
 
-  useEffect(() => {
+  const checkTokenExpiration = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/auth/demo");
-      return;
+      return false;
     }
-    fetchInvoices();
+
+    try {
+      const decodedToken = jwtDecode<{ exp: number }>(token);
+      if (!decodedToken.exp || decodedToken.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        router.push("/auth/demo");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      localStorage.removeItem("token");
+      router.push("/auth/demo");
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (checkTokenExpiration()) {
+      fetchInvoices();
+    }
   }, [router, fetchInvoices]);
 
   return (

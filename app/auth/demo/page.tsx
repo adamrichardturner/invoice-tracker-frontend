@@ -43,7 +43,8 @@ export default function DemoPage() {
           <CardFooter className="flex flex-col items-center justify-center">
             <Link href="https://adamrichardturner.dev">
               <p className="text-sm text-charcoal">
-                Made by Adam Richard Turner
+                Made by{" "}
+                <span className="font-bold underline">Adam Richard Turner</span>
               </p>
             </Link>
           </CardFooter>

@@ -28,6 +28,7 @@
     "date-fns": "^3.6.0",
     "framer-motion": "^11.3.19",
     "jose": "^5.9.6",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.408.0",
     "morgan": "^1.10.0",
     "next": "14.2.5",

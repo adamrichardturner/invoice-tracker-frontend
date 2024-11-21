@@ -26,32 +26,15 @@ const isAxiosError = (
 // Login with demo credentials
 export const loginWithDemo = async () => {
   try {
-    await api.post("/user/demo-login");
+    const response = await api.post("/user/demo-login");
 
-    // Wait to ensure cookie propagation
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Check for the token cookie
-    if (document.cookie.includes("token")) {
-      return { success: true };
-    }
-
-    // Additional production check for stricter validation
-    if (
-      process.env.NODE_ENV === "production" &&
-      !document.cookie.includes("token")
-    ) {
-      throw new Error("Token not set in production environment");
-    }
-
+    // Remove the cookie check since it's already handled by the backend
+    // and might not be immediately available in the document.cookie
     return { success: true };
   } catch (error: unknown) {
-    // Handle Axios-specific errors with proper typing
     if (isAxiosError(error) && error.response?.data?.message) {
       throw new Error(error.response.data.message);
     }
-
-    // Handle other unknown errors
     throw new Error("Failed to login with demo account");
   }
 };

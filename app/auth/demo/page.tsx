@@ -11,10 +11,14 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function DemoPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDemoLogin = async () => {
     try {
+      setIsLoading(true);
       const response = await loginWithDemo();
       if (response.success) {
         const delay = process.env.NODE_ENV === "production" ? 1000 : 100;
@@ -27,6 +31,8 @@ export default function DemoPage() {
         error instanceof Error ? error.message : "Demo login failed";
       console.error("Demo login failed:", errorMessage);
       toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,9 +48,10 @@ export default function DemoPage() {
           <Button
             onClick={handleDemoLogin}
             size="lg"
+            disabled={isLoading}
             className="dark:bg-btn-primary bg-primary text-md text-white"
           >
-            Try Demo
+            {isLoading ? "Logging in..." : "Try Demo"}
           </Button>
           <CardFooter className="flex flex-col items-center justify-center">
             <Link href="https://adamrichardturner.dev">

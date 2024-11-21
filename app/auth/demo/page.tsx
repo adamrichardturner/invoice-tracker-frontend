@@ -12,19 +12,18 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DemoPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleDemoLogin = async () => {
     try {
       setIsLoading(true);
       const response = await loginWithDemo();
       if (response.success) {
-        const delay = process.env.NODE_ENV === "production" ? 1000 : 100;
-        setTimeout(() => {
-          window.location.href = "/";
-        }, delay);
+        router.push("/");
       }
     } catch (error) {
       const errorMessage =
@@ -51,7 +50,7 @@ export default function DemoPage() {
             disabled={isLoading}
             className="dark:bg-btn-primary bg-primary text-md text-white"
           >
-            {isLoading ? "Logging in..." : "Try Demo"}
+            Try Demo
           </Button>
           <CardFooter className="flex flex-col items-center justify-center">
             <Link href="https://adamrichardturner.dev">

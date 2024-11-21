@@ -7,6 +7,7 @@ import InvoiceSingleNav from "@/components/InvoiceSingle/InvoiceSingleNav/Invoic
 import BackButton from "@/components/BackButton/BackButton";
 import { Invoice } from "@/types/Invoice";
 import InvoiceDetail from "@/components/InvoiceDetail/InvoiceDetail";
+import Sidebar from "@/components/Sidebar/Sidebar";
 
 type Props = {
   params: {
@@ -37,6 +38,7 @@ export default function InvoicePage({ params }: Props) {
 
   return (
     <div className="flex min-h-screen md:ml-[103px] items-start pt-[120px] md:pt-[65px] pb-[56px] md:pb-0 justify-center">
+      <Sidebar />
       <main className="flex flex-col h-full w-full md:w-[768px] items-center justify-center mx-4">
         <BackButton path="/" />
         <InvoiceSingleNav invoice={selectedInvoice} />

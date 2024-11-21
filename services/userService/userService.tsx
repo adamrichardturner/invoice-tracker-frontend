@@ -32,9 +32,6 @@ export const login = async (email: string, password: string) => {
 export const loginWithDemo = async () => {
   try {
     const response = await api.post("/user/demo-login");
-    if (response.data.token) {
-      return response.data;
-    }
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {

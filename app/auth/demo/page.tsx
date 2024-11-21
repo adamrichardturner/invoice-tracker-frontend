@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { loginWithDemo } from "@/services/userService/userService";
 import {
   Card,
@@ -13,12 +12,13 @@ import {
 import Link from "next/link";
 
 export default function DemoPage() {
-  const router = useRouter();
-
   const handleDemoLogin = async () => {
     try {
-      await loginWithDemo();
-      router.push("/");
+      const response = await loginWithDemo();
+      if (response.success) {
+        // Force a hard refresh to ensure cookie is detected
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Demo login failed:", error);
     }

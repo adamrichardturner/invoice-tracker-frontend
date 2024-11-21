@@ -5,12 +5,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Add interceptor to include token in requests if it exists
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
   return config;
 });
 
@@ -38,10 +33,7 @@ export const loginWithDemo = async () => {
   try {
     const response = await api.post("/user/demo-login");
     if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      document.cookie = `token=${response.data.token}; path=/`;
-      api.defaults.headers.common["Authorization"] =
-        `Bearer ${response.data.token}`;
+      return response.data;
     }
     return response.data;
   } catch (error: unknown) {
@@ -54,7 +46,7 @@ export const loginWithDemo = async () => {
 
 export const logout = async () => {
   try {
-    localStorage.removeItem("token");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
     delete api.defaults.headers.common["Authorization"];
     return { success: true };
   } catch (error: unknown) {

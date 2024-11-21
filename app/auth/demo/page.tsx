@@ -10,17 +10,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function DemoPage() {
   const handleDemoLogin = async () => {
     try {
       const response = await loginWithDemo();
       if (response.success) {
-        // Force a hard refresh to ensure cookie is detected
-        window.location.href = "/";
+        const delay = process.env.NODE_ENV === "production" ? 1000 : 100;
+        setTimeout(() => {
+          window.location.href = "/";
+        }, delay);
       }
     } catch (error) {
-      console.error("Demo login failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Demo login failed";
+      console.error("Demo login failed:", errorMessage);
+      toast.error(errorMessage);
     }
   };
 

@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("token");
+  const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
+
+  console.log("Token:", token);
 
   // Allow access to auth routes and static files
   if (pathname.startsWith("/auth") || pathname.startsWith("/_next")) {

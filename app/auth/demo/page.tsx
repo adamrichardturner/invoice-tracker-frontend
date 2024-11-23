@@ -22,8 +22,9 @@ export default function DemoPage() {
     try {
       setIsLoading(true);
       const response = await loginWithDemo();
+      console.log("Demo login response:", response);
       if (response.success) {
-        router.push("/");
+        window.location.href = "/";
       }
     } catch (error) {
       const errorMessage =

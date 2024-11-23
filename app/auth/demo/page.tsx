@@ -21,10 +21,7 @@ export default function DemoPage() {
   const handleDemoLogin = async () => {
     try {
       setIsLoading(true);
-      const response = await loginWithDemo();
-      if (response.success) {
-        router.push("/");
-      }
+      await loginWithDemo();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Demo login failed";
@@ -50,7 +47,7 @@ export default function DemoPage() {
             disabled={isLoading}
             className="dark:bg-btn-primary bg-primary text-md text-white"
           >
-            Try Demo
+            {isLoading ? "Loading..." : "Try Demo"}
           </Button>
           <CardFooter className="flex flex-col items-center justify-center">
             <Link href="https://adamrichardturner.dev">

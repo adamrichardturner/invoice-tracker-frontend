@@ -1,41 +1,32 @@
+// middleware.ts (or middleware.js)
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
+  const token = request.cookies.get("token");
   const { pathname } = request.nextUrl;
 
   console.log("Token:", token);
 
-  // If we have a token and we're on the auth page, redirect to home
-  if (token && pathname.startsWith("/auth")) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // Allow access to auth routes and static files
-  if (pathname.startsWith("/auth") || pathname.startsWith("/_next")) {
+  if (token) {
+    // If token exists and user is on an auth page, redirect to home
+    if (pathname.startsWith("/auth")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    // Allow access to all other routes
+    return NextResponse.next();
+  } else {
+    // If no token and user is not on an auth page, redirect to /auth/demo
+    if (!pathname.startsWith("/auth/demo")) {
+      return NextResponse.redirect(new URL("/auth/demo", request.url));
+    }
+    // Allow access to /auth/demo
     return NextResponse.next();
   }
-
-  // Redirect to demo page if no token
-  if (!token) {
-    return NextResponse.redirect(new URL("/auth/demo", request.url));
-  }
-
-  return NextResponse.next();
 }
 
-// Configure which routes to run middleware on
+// Apply middleware to all routes
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - auth (login/register pages)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!auth|_next/static|_next/image|favicon.ico).*)",
-    "/auth/:path*",
-  ],
+  matcher: "/:path*",
 };

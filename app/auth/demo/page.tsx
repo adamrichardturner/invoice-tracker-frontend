@@ -12,19 +12,18 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function DemoPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleDemoLogin = async () => {
     try {
       setIsLoading(true);
       const response = await loginWithDemo();
       if (response.success) {
+        toast.success("Logging in...");
         setTimeout(() => {
-          router.push("/");
+          window.location.href = "/";
         }, 1250);
       }
     } catch (error) {
@@ -32,7 +31,6 @@ export default function DemoPage() {
         error instanceof Error ? error.message : "Demo login failed";
       console.error("Demo login failed:", errorMessage);
       toast.error(errorMessage);
-    } finally {
       setIsLoading(false);
     }
   };

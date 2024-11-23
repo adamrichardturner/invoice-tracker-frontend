@@ -7,6 +7,11 @@ export function middleware(request: NextRequest) {
 
   console.log("Token:", token);
 
+  // If we have a token and we're on the auth page, redirect to home
+  if (token && pathname.startsWith("/auth")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   // Allow access to auth routes and static files
   if (pathname.startsWith("/auth") || pathname.startsWith("/_next")) {
     return NextResponse.next();
@@ -31,5 +36,6 @@ export const config = {
      * - favicon.ico (favicon file)
      */
     "/((?!auth|_next/static|_next/image|favicon.ico).*)",
+    "/auth/:path*",
   ],
 };

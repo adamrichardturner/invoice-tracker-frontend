@@ -8,7 +8,7 @@ interface APIErrorResponse {
 // Create the Axios instance
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // Allow credentials (cookies) in cross-origin requests
+  withCredentials: true,
 });
 
 // Axios request interceptor (if needed for additional configuration)
@@ -26,22 +26,8 @@ const isAxiosError = (
 // Login with demo credentials
 export const loginWithDemo = async () => {
   try {
-    const response = await api.post("/user/demo-login");
-
-    console.log("Demo login response headers:", response.headers);
-    console.log("Demo login response cookies:", document.cookie);
-
-    // Check if we received a token in the response data
-    if (!response.data?.token) {
-      throw new Error("No token received from server");
-    }
-
-    // Manually set the cookie if it's not being set by the server
-    if (!document.cookie.includes("token=")) {
-      document.cookie = `token=${response.data.token}; path=/; secure; samesite=strict; max-age=86400`;
-    }
-
-    return { success: true, token: response.data.token };
+    await api.post("/user/demo-login");
+    return { success: true };
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.data?.message) {
       throw new Error(error.response.data.message);

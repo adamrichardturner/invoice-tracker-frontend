@@ -21,7 +21,12 @@ export default function DemoPage() {
   const handleDemoLogin = async () => {
     try {
       setIsLoading(true);
-      await loginWithDemo();
+      const response = await loginWithDemo();
+      if (response.success) {
+        setTimeout(() => {
+          router.push("/");
+        }, 1250);
+      }
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Demo login failed";
